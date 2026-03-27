@@ -22,8 +22,9 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll() // Cho phép truy cập /login không cần auth
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Cho phép Swagger Open API
+                .requestMatchers("/api/v1/auth/**").permitAll()          // Auth (đăng nhập)
+                .requestMatchers("/api/v1/courses/**").permitAll()        // Courses (công khai)
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
                 .anyRequest().authenticated()
             );
 
