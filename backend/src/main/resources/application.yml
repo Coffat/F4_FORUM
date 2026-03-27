@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: F4 Forum Backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/f4_forum?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    # Sử dụng none/validate vì Database schema đã được init.sql quản lý hoàn toàn!
+    hibernate:
+      ddl-auto: none
+
+server:
+  port: 8080

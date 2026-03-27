@@ -1,0 +1,21 @@
+# Misc
+.DS_Store
+*.pem
+
+# Frontend
+frontend/node_modules
+frontend/.next
+frontend/out
+frontend/.vercel
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Backend
+backend/target
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Docker
+.docker
+
+# Environment
+.env*

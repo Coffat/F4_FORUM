@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: f4_forum_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: f4_forum
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Mount file init.sql vào thư mục khởi tạo mặc định của MySQL
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Container phụ làm nhiệm vụ Watch sự thay đổi của file init.sql
+  # Cơ chế: Sử dụng inotifywait để lắng nghe sự thay đổi trên init.sql.
+  # Mỗi khi bạn Ctrl+S, nó sẽ kích hoạt lệnh mysql import lại file sql đó vào csdl.
+  db-watcher:
+    image: alpine:latest
+    container_name: f4_forum_db_watcher
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./init.sql:/workspace/init.sql:ro
+    command: >
+      sh -c "
+        apk add --no-cache inotify-tools mysql-client &&
+        echo 'Watcher is ready! Waiting for init.sql changes...' &&
+        while inotifywait -e modify /workspace/init.sql; do
+          echo 'init.sql modified! Reloading schema into MySQL...' &&
+          mysql -h mysql -uroot -proot f4_forum < /workspace/init.sql &&
+          echo 'Schema reloaded successfully!'
+        done
+      "
+
+volumes:
+  mysql_data:
