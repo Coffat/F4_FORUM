@@ -307,8 +307,10 @@ CREATE INDEX idx_schedule_date ON schedules(date);
 CREATE INDEX idx_invoice_student ON invoices(student_id);
 
 -- ==========================================
--- 4. SEED DATA TÀI KHOẢN ADMIN XÁC THỰC
+-- 4. SEED DATA
 -- ==========================================
+
+-- ── Admin Account ──────────────────────────────────────────────────────
 INSERT INTO users (id, full_name, phone, email, status, user_type)
 VALUES (1, 'Quản trị viên Hệ thống', '0123456789', 'admin@f4forum.com', 'ACTIVE', 'STAFF');
 
@@ -318,3 +320,96 @@ VALUES (1, 'IT Administration');
 -- Mật khẩu "1" đã được mã hóa BCrypt chính xác
 INSERT INTO user_accounts (user_id, username, password_hash, role)
 VALUES (1, 'admin', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_ADMIN');
+
+-- ── Chi Nhánh ─────────────────────────────────────────────────────────
+INSERT INTO branches (id, name, address, phone) VALUES
+(1, 'F4 Forum – Hồ Chí Minh (Quận 1)',  '123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.HCM', '028-3911-2222'),
+(2, 'F4 Forum – Hà Nội (Đống Đa)',       '88 Hoàng Cầu, Phường Ô Chợ Dừa, Quận Đống Đa, Hà Nội', '024-3927-4455');
+
+-- ── Phòng Học ─────────────────────────────────────────────────────────
+INSERT INTO rooms (id, branch_id, name, capacity, room_type) VALUES
+(1, 1, 'Phòng 101 – Lớp Nhỏ',     15, 'CLASSROOM'),
+(2, 1, 'Phòng 201 – Lớp Trung',   25, 'CLASSROOM'),
+(3, 1, 'Phòng 301 – Hội Thảo',    40, 'SEMINAR'),
+(4, 1, 'Phòng 401 – Speaking Lab', 12, 'LAB'),
+(5, 2, 'Phòng A01 – Lớp Nhỏ',     15, 'CLASSROOM'),
+(6, 2, 'Phòng A02 – Lớp Trung',   25, 'CLASSROOM');
+
+-- ── Giáo Viên ─────────────────────────────────────────────────────────
+INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
+(2, 'Nguyễn Lan Anh', '0901111222', 'lan.anh@f4forum.com', 'ACTIVE', 'TEACHER'),
+(3, 'Trần Minh Quân', '0902222333', 'minh.quan@f4forum.com', 'ACTIVE', 'TEACHER'),
+(4, 'Phạm Thu Hà',   '0903333444', 'thu.ha@f4forum.com', 'ACTIVE', 'TEACHER'),
+(5, 'Lê Văn Đức',    '0904444555', 'van.duc@f4forum.com', 'ACTIVE', 'TEACHER');
+
+INSERT INTO teachers (user_id, specialty, hire_date) VALUES
+(2, 'IELTS Academic, Cambridge CELTA – Band 8.5', '2020-03-01'),
+(3, 'IELTS General, Business English – Band 8.0', '2019-09-15'),
+(4, 'Academic Writing, IELTS Writing – Band 8.5', '2021-06-01'),
+(5, 'IELTS Expert, Speaking Coach – Band 9.0',     '2018-01-10');
+
+-- ── Khóa Học IELTS (8 level – từ căn bản đến Band 8.0+) ──────────────
+INSERT INTO courses (id, code, name, description, level, fee) VALUES
+(1,  'IELTS-FON', 'IELTS Foundation – Khởi Đầu',
+    'Khởi đầu hành trình IELTS từ con số 0. Xây nền tảng vững chắc về ngữ pháp, từ vựng cơ bản, phát âm và 4 kỹ năng theo chuẩn Cambridge. Phù hợp học viên chưa biết gì về IELTS. Mục tiêu đầu ra: 3.0 – 4.0.',
+    'STARTER', 3800000.00),
+
+(2,  'IELTS-ELM', 'IELTS Elementary – Nền Tảng',
+    'Củng cố nền tảng ngữ pháp và phát triển đồng đều 4 kỹ năng. Làm quen với cấu trúc đề thi IELTS và các dạng bài phổ biến. Bước đệm quan trọng trước khi chinh phục Band 5.0.',
+    'ELEMENTARY', 4200000.00),
+
+(3,  'IELTS-PRE', 'IELTS Pre-Intermediate – Bước Đệm',
+    'Nâng cao kỹ năng nghe nói đọc viết, làm quen cấu trúc đề thi chính thức. Thực hành chiến lược thi thật với đề IELTS Cambridge. Mục tiêu Band 5.0 – 5.5.',
+    'PRE-INTERMEDIATE', 4800000.00),
+
+(4,  'IELTS-INT', 'IELTS Intermediate – Đột Phá',
+    'Đột phá Band 6.0 với chiến lược ôn thi chuyên sâu, mock test thực chiến hàng tuần và phản hồi cá nhân hóa từ giảng viên. Học viên được luyện tập với đề thi thật từ Cambridge.',
+    'INTERMEDIATE', 5500000.00),
+
+(5,  'IELTS-UPP', 'IELTS Upper-Intermediate – Vươn Xa',
+    'Tinh chỉnh từng kỹ năng, xử lý chuyên sâu Writing Task 2 và Speaking Part 3. Chiến lược nâng band từ 6.0 lên 6.5. Phân tích từng lỗi sai và kỹ thuật ghi điểm tối đa.',
+    'UPPER-INTERMEDIATE', 6200000.00),
+
+(6,  'IELTS-ADV', 'IELTS Advanced – Chinh Phục',
+    'Chinh phục Band 7.0 từ nền tảng 6.5. Kỹ thuật nâng cao cho Writing Academic và Speaking Part 3. Phân tích bài thi IELTS Cambridge chuyên sâu. Luyện thi cùng cựu giám khảo IELTS.',
+    'ADVANCED', 7200000.00),
+
+(7,  'IELTS-PRO', 'IELTS Professional – Xuất Sắc',
+    'Lớp tinh anh dành cho học viên mục tiêu 7.5. Luyện tập 1-1 cùng cựu giám khảo IELTS Cambridge. Phân tích từng câu trả lời, ghi chép điểm yếu và cải thiện theo lộ trình cá nhân hóa.',
+    'HIGH-ADVANCED', 8500000.00),
+
+(8,  'IELTS-EXP', 'IELTS Expert – Đỉnh Cao 8.0+',
+    'Chinh phục Band 8.0 trở lên với lộ trình 1-1 hoàn toàn cùng chuyên gia Band 9.0. Phân tích sâu từng câu trả lời, luyện tập cường độ cao. Cam kết đầu ra Band 8.0+ hoặc học lại miễn phí.',
+    'EXPERT', 9800000.00),
+
+-- ── Khóa Học Khác ─────────────────────────────────────────────────────
+(9,  'ACAD-WRT', 'Academic Writing Mastery',
+    'Thành thạo kỹ năng viết học thuật chuẩn quốc tế: luận văn, báo cáo khoa học và bài luận phong cách Cambridge. Phù hợp nghiên cứu sinh và sinh viên đại học quốc tế.',
+    'ADVANCED', 4999000.00),
+
+(10, 'BIZ-ENG', 'Business English Elite',
+    'Tiếng Anh thương mại thực chiến: đàm phán, thuyết trình, viết email chuyên nghiệp và văn hóa doanh nghiệp quốc tế. Lớp học mô phỏng môi trường công ty đa quốc gia thực tế.',
+    'INTERMEDIATE', 5499000.00);
+
+-- ── Lớp Học (Classes) ─────────────────────────────────────────────────
+INSERT INTO classes (id, course_id, default_room_id, class_code, start_date, end_date, max_students, status) VALUES
+(1, 1, 1, 'FON-2026-01', '2026-04-07', '2026-06-30', 15, 'OPEN'),
+(2, 2, 1, 'ELM-2026-01', '2026-04-07', '2026-06-30', 15, 'OPEN'),
+(3, 3, 2, 'PRE-2026-01', '2026-04-07', '2026-07-14', 20, 'OPEN'),
+(4, 4, 2, 'INT-2026-01', '2026-04-14', '2026-07-21', 20, 'OPEN'),
+(5, 5, 2, 'UPP-2026-01', '2026-04-14', '2026-07-28', 18, 'OPEN'),
+(6, 6, 3, 'ADV-2026-01', '2026-04-21', '2026-08-04', 25, 'OPEN'),
+(7, 7, 4, 'PRO-2026-01', '2026-04-21', '2026-08-04', 12, 'OPEN'),
+(8, 8, 4, 'EXP-2026-01', '2026-05-01', '2026-08-31',  8, 'OPEN');
+
+-- ── Phân Công Giáo Viên ────────────────────────────────────────────────
+INSERT INTO class_teachers (class_id, teacher_id) VALUES
+(1, 2), -- FON → Ms. Lan Anh
+(2, 3), -- ELM → Mr. Minh Quan
+(3, 4), -- PRE → Ms. Thu Ha
+(4, 3), -- INT → Mr. Minh Quan
+(5, 4), -- UPP → Ms. Thu Ha
+(6, 2), -- ADV → Ms. Lan Anh
+(7, 5), -- PRO → Mr. Van Duc
+(8, 5); -- EXP → Mr. Van Duc
+
