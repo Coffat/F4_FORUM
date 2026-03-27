@@ -4,6 +4,55 @@ Tài liệu tham khảo các Endpoints cho giao tiếp giữa Frontend và Backe
 
 ---
 
+## 📚 2. Course Module (IELTS/English Programs)
+
+Module quản lý danh sách các khóa học đào tạo của trung tâm.
+
+### Lấy danh sách khóa học (GetAll)
+Lấy toàn bộ các khóa học đang hoạt động hoặc lọc theo tiêu chí.
+
+- **URL**: `/api/v1/courses`
+- **Method**: `GET`
+- **Auth required**: No
+
+#### Query Parameters
+| Tham số | Kiểu dữ liệu | Mô tả |
+| :--- | :---: | :--- |
+| `level` | String | Lọc theo trình độ (VD: `STARTER`, `ADVANCED`, `EXPERT`) |
+| `keyword` | String | Tìm kiếm theo tên hoặc mã khóa học |
+
+#### Response - Thành công (HTTP 200 OK)
+Mảng JSON chứa các đối tượng `CourseDTO`.
+
+*Ví dụ:*
+```json
+[
+  {
+    "id": 1,
+    "code": "IELTS-FON",
+    "name": "IELTS Foundation",
+    "description": "...",
+    "level": "STARTER",
+    "fee": 3800000.00
+  }
+]
+```
+
+### Lấy chi tiết khóa học (GetById)
+Xem chi tiết một khóa học thông qua ID.
+
+- **URL**: `/api/v1/courses/{id}`
+- **Method**: `GET`
+- **Auth required**: No
+
+#### Path Variables
+| Tên | Kiểu dữ liệu | Mô tả |
+| :--- | :---: | :--- |
+| `id` | Long | ID duy nhất của khóa học |
+
+---
+*Cập nhật: 28/03/2026 bởi Senior Backend Architect*
+
 ## 🔐 1. Authentication Module
 
 ### Đăng nhập (Login)

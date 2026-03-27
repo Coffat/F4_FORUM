@@ -2,6 +2,7 @@ package com.f4.forum.service;
 
 import com.f4.forum.dto.CourseDTO;
 import com.f4.forum.entity.Course;
+import com.f4.forum.mapper.CourseMapper;
 import com.f4.forum.repository.CourseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,16 +14,18 @@ import java.util.List;
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final CourseMapper courseMapper;
 
-    public CourseService(CourseRepository courseRepository) {
+    public CourseService(CourseRepository courseRepository, CourseMapper courseMapper) {
         this.courseRepository = courseRepository;
+        this.courseMapper = courseMapper;
     }
 
     /** Lấy toàn bộ khóa học */
     public List<CourseDTO> getAllCourses() {
         return courseRepository.findAll()
                 .stream()
-                .map(this::toDTO)
+                .map(courseMapper::toDTO)
                 .toList();
     }
 
@@ -30,14 +33,14 @@ public class CourseService {
     public CourseDTO getCourseById(Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khóa học với ID: " + id));
-        return toDTO(course);
+        return courseMapper.toDTO(course);
     }
 
     /** Tìm kiếm khóa học theo tên */
     public List<CourseDTO> searchByName(String keyword) {
         return courseRepository.findByNameContainingIgnoreCase(keyword)
                 .stream()
-                .map(this::toDTO)
+                .map(courseMapper::toDTO)
                 .toList();
     }
 
@@ -45,19 +48,7 @@ public class CourseService {
     public List<CourseDTO> filterByLevel(String level) {
         return courseRepository.findByLevelIgnoreCase(level)
                 .stream()
-                .map(this::toDTO)
+                .map(courseMapper::toDTO)
                 .toList();
-    }
-
-    // ─── Private mapper ──────────────────────────────────────────────────────
-    private CourseDTO toDTO(Course course) {
-        return new CourseDTO(
-                course.getId(),
-                course.getCode(),
-                course.getName(),
-                course.getDescription(),
-                course.getLevel(),
-                course.getFee()
-        );
     }
 }

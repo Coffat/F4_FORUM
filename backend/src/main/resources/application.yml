@@ -8,6 +8,11 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  # Sử dụng Virtual Threads (Java 21) cho hiệu năng cực cao - Skill #1
+  threads:
+    virtual:
+      enabled: true
+
   jpa:
     show-sql: true
     properties:
