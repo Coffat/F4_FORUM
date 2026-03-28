@@ -47,4 +47,9 @@ public class User extends BaseEntity {
         this.phone = phone;
         this.email = email;
     }
+
+    public void updateBasicInfo(String fullName, UserStatus status) {
+        this.fullName = fullName;
+        this.status = status;
+    }
 }

@@ -100,3 +100,77 @@ Sai mật khẩu!
 ```text
 Tài khoản không tồn tại!
 ```
+
+---
+
+## 🛠️ 3. Admin - User Management Module
+
+Module dành riêng cho Quản trị viên điều hành nhân sự, học viên và hệ thống.
+
+### Lấy danh sách User (Paginated)
+Tìm kiếm và phân trang toàn bộ người dùng trong hệ thống.
+
+- **URL**: `/api/admin/users`
+- **Method**: `GET`
+- **Auth required**: Yes (ROLE_ADMIN)
+
+#### Query Parameters
+| Tham số | Kiểu dữ liệu | Mô tả |
+| :--- | :---: | :--- |
+| `search` | String | Tìm kiếm theo Tên hoặc Email |
+| `page` | Integer | Số trang (0-indexed) |
+| `size` | Integer | Số lượng bản ghi mỗi trang |
+
+### Xem chỉ số Metrics
+Lấy các số liệu tổng hợp về trạng thái người dùng.
+
+- **URL**: `/api/admin/users/metrics`
+- **Method**: `GET`
+- **Auth required**: Yes (ROLE_ADMIN)
+
+### Tạo mới người dùng (Create)
+Tạo User (Sử dụng Factory Pattern cho Student/Teacher/Staff) và tài khoản đăng nhập.
+
+- **URL**: `/api/admin/users`
+- **Method**: `POST`
+- **Auth required**: Yes (ROLE_ADMIN)
+
+#### Request Body (CreateUserCommand)
+```json
+{
+  "fullName": "Nguyễn Văn A",
+  "username": "nva",
+  "rawPassword": "1",
+  "email": "nva@f4forum.com",
+  "phone": "0901234567",
+  "userType": "STUDENT",
+  "role": "ROLE_STUDENT",
+  "dateOfBirth": "2005-05-15",
+  "gender": "Nam",
+  "address": "123 Quận 1, Tp.HCM"
+}
+```
+
+### Cập nhật người dùng (Update)
+Chỉ cập nhật các thông tin cơ bản: Tên, Email, SĐT và Trạng thái.
+
+- **URL**: `/api/admin/users/{id}`
+- **Method**: `PUT`
+- **Auth required**: Yes (ROLE_ADMIN)
+
+#### Request Body (UpdateUserCommand)
+```json
+{
+  "fullName": "Nguyễn Văn A (Updated)",
+  "email": "nva.new@f4forum.com",
+  "phone": "0909999888",
+  "status": "ACTIVE"
+}
+```
+
+### Xóa người dùng (Delete)
+Xóa vĩnh viễn User và Account liên quan.
+
+- **URL**: `/api/admin/users/{id}`
+- **Method**: `DELETE`
+- **Auth required**: Yes (ROLE_ADMIN)

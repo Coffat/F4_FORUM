@@ -7,6 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: f4_forum
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES utf8mb4'
     ports:
       - "3306:3306"
     volumes:
@@ -36,7 +37,7 @@ services:
         echo 'Watcher is ready! Waiting for init.sql changes...' &&
         while inotifywait -e modify /workspace/init.sql; do
           echo 'init.sql modified! Reloading schema into MySQL...' &&
-          mysql -h mysql -uroot -proot f4_forum < /workspace/init.sql &&
+          mysql --default-character-set=utf8mb4 -h mysql -uroot -proot f4_forum < /workspace/init.sql &&
           echo 'Schema reloaded successfully!'
         done
       "

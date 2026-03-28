@@ -21,10 +21,11 @@ export async function loginAction(
   const validated = loginSchema.safeParse(data);
   
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
   
   let resultToken = null;
+  let resultRole = null;
   try {
     const response = await fetch('http://localhost:8080/api/v1/auth/login', {
       method: 'POST',
@@ -34,18 +35,17 @@ export async function loginAction(
     
     if (!response.ok) {
       const errMessage = await response.text();
-      // Server backend trả về badRequest với body là chuỗi lỗi
       return { error: errMessage || 'Tài khoản hoặc mật khẩu không chính xác!' };
     }
     
     const payload = await response.json();
     resultToken = payload.token;
+    resultRole = payload.role;
   } catch (error) {
     console.error('Lỗi khi kết nối BE:', error);
     return { error: 'Backend Server không phản hồi! (Lỗi Connection)' };
   }
   
-  // Lưu token vào Browser Cookies (Async in Next 15)
   const cookieStore = await cookies();
   cookieStore.set('auth_token', resultToken, { 
     httpOnly: true, 
@@ -53,7 +53,9 @@ export async function loginAction(
     path: '/'
   });
   
-  // Thực hiện điều hướng trang sau khi Login thành công
-  // Lệnh này throw lỗi ngầm để Next App Router bắt nên bắt buộc để ngoài try/catch
-  redirect('/dashboard');
+  if (resultRole === 'ROLE_ADMIN' || resultRole === 'STAFF') {
+    redirect('/admin');
+  } else {
+    redirect('/dashboard');
+  }
 }
