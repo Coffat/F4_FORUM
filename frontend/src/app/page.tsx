@@ -14,7 +14,13 @@ import {
 } from "lucide-react";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
-const NAV_LINKS = ["Courses", "Schedule", "Community", "Instructors"];
+const NAV_LINKS = [
+  { name: "Courses", href: "#courses" },
+  { name: "Schedule", href: "#" },
+  { name: "Community", href: "#" },
+  { name: "Instructors", href: "#instructors" },
+  { name: "About Us", href: "/about" },
+];
 
 const FEATURES = [
   {
@@ -119,11 +125,11 @@ const Navbar = () => (
       <div className="hidden md:flex items-center gap-8">
         {NAV_LINKS.map((item) => (
           <Link
-            key={item}
-            href="#"
+            key={item.name}
+            href={item.href}
             className="text-slate-600 text-sm font-medium hover:text-blue-700 transition-colors"
           >
-            {item}
+            {item.name}
           </Link>
         ))}
       </div>
