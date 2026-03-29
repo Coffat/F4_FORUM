@@ -123,9 +123,9 @@ export function StaffFormModal({ mode = 'create', initialData, iconOnly = false 
     const formData = new FormData(e.currentTarget)
     const data = Object.fromEntries(formData)
 
-    // For create we also need role. It typically mirrors userType.
+    // AccountRole enum: ROLE_TEACHER | ROLE_STAFF | … — không dùng chuỗi "STAFF" (sai enum).
     if (mode === 'create') {
-        data['role'] = selectedType === 'TEACHER' ? 'ROLE_TEACHER' : 'STAFF'; 
+      data['role'] = selectedType === 'TEACHER' ? 'ROLE_TEACHER' : 'ROLE_STAFF'
     }
     
     // Create/Update call
