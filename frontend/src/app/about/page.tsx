@@ -112,6 +112,7 @@ const HeroSection = () => (
         src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&auto=format&fit=crop&q=80"
         alt="Office background"
         fill
+        sizes="100vw"
         className="object-cover opacity-10"
         priority
       />
@@ -168,6 +169,7 @@ const JourneySection = () => (
             src="https://images.unsplash.com/photo-1497215842964-222b430dc094?w=800&auto=format&fit=crop&q=80"
             alt="Our Journey"
             fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
           />
         </div>
@@ -232,6 +234,7 @@ const MethodSection = () => (
             src="https://images.unsplash.com/photo-1454165833767-027508496b4c?w=600&auto=format&fit=crop&q=80"
             alt="Method detail"
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover"
           />
         </div>
@@ -276,6 +279,7 @@ const MethodSection = () => (
             src="https://images.unsplash.com/photo-1522071823991-b9676552b9ae?w=1000&auto=format&fit=crop&q=80"
             alt="Collaborative Intelligence"
             fill
+            sizes="(max-width: 1024px) 100vw, 66vw"
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />

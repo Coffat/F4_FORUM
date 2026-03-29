@@ -42,18 +42,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // ── Redirect nếu đã đăng nhập mà vào /login ─────────────────────
-  if (pathname === '/login' && token) {
-    switch (role) {
-      case 'ROLE_ADMIN':
-        return NextResponse.redirect(new URL('/admin', request.url));
-      case 'ROLE_STAFF':
-        return NextResponse.redirect(new URL('/staff/dashboard', request.url));
-      default:
-        return NextResponse.redirect(new URL('/', request.url));
-    }
-  }
-
   return NextResponse.next();
 }
 
@@ -62,9 +50,5 @@ export function middleware(request: NextRequest) {
  * Không chạy trên static files, _next, favicon...
  */
 export const config = {
-  matcher: [
-    '/admin/:path*',
-    '/staff/:path*',
-    '/login',
-  ],
+  matcher: ['/admin/:path*', '/staff/:path*'],
 };

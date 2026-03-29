@@ -260,6 +260,7 @@ const CoursesSection = () => (
                 src={c.image}
                 alt={c.title}
                 fill
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               {/* Badges */}
@@ -313,6 +314,7 @@ const CommunitySection = () => (
               src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&auto=format&fit=crop&q=80"
               alt="Community study"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent" />
