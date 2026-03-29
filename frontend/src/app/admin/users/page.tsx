@@ -56,19 +56,24 @@ export default async function UserManagementPage({
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
 
-  const headers = { 
-    'Authorization': `Bearer ${token || ''}`,
+  const headers: Record<string, string> = { 
     'Content-Type': 'application/json'
   };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   // Safe fetch function
   async function fetchWithAuth(url: string) {
-    if (!token) return null;
     try {
       const res = await fetch(url, { headers, cache: 'no-store' });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        console.error(`Fetch error ${res.status} for ${url}`);
+        return null;
+      }
       return res.json();
-    } catch {
+    } catch (err) {
+      console.error(`Fetch exception for ${url}:`, err);
       return null;
     }
   }
