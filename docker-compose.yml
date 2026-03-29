@@ -37,7 +37,7 @@ services:
         echo 'Watcher is ready! Waiting for init.sql changes...' &&
         while inotifywait -e modify /workspace/init.sql; do
           echo 'init.sql modified! Reloading schema into MySQL...' &&
-          mysql --default-character-set=utf8mb4 -h mysql -uroot -proot f4_forum < /workspace/init.sql &&
+          mysql --ssl-mode=DISABLED --default-character-set=utf8mb4 -h mysql -uroot -proot f4_forum < /workspace/init.sql &&
           echo 'Schema reloaded successfully!'
         done
       "
