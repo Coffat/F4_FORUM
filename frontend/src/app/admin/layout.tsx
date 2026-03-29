@@ -21,7 +21,6 @@ import Image from "next/image";
 
 const SIDEBAR_LINKS = [
   { name: "DASHBOARD", icon: LayoutDashboard, href: "/admin" },
-  { name: "STAFF DASHBOARD", icon: Activity, href: "/admin/staff/dashboard" },
   { name: "USERS", icon: Users, href: "/admin/users" },
   { name: "STAFF", icon: Briefcase, href: "/admin/staff" },
   { name: "BRANCHES", icon: MapPin, href: "/admin/branches" },

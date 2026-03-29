@@ -15,15 +15,16 @@ import {
   Settings,
   ClipboardList,
   Activity,
+  Plus,
 } from "lucide-react";
 import Image from "next/image";
 
 const STAFF_NAV = [
-  { name: "MY DASHBOARD", icon: LayoutDashboard, href: "/staff/dashboard" },
-  { name: "DIRECTORY", icon: Users, href: "/staff/directory" },
-  { name: "SCHEDULES", icon: Calendar, href: "/staff/schedules" },
-  { name: "COURSES", icon: BookOpen, href: "/courses" },
-  { name: "TASKS", icon: ClipboardList, href: "/staff/tasks" },
+  { name: "Dashboard", icon: LayoutDashboard, href: "/staff/dashboard" },
+  { name: "Curriculum", icon: BookOpen, href: "/staff/curriculum" },
+  { name: "Resources", icon: Calendar, href: "/staff/resources" }, // Changed to Calendar for Resources as per similar vibe
+  { name: "Analytics", icon: Activity, href: "/staff/analytics" },
+  { name: "Community", icon: Users, href: "/staff/community" },
 ];
 
 export default function StaffPortalLayout({
@@ -77,6 +78,13 @@ export default function StaffPortalLayout({
           </nav>
         </div>
 
+        <div className="px-6 mb-4">
+           <button className="w-full flex items-center justify-center gap-2 bg-[#0B3A9A] text-white py-3 rounded-xl font-bold text-sm hover:bg-blue-800 transition-all shadow-md shadow-blue-200">
+             <Plus className="w-4 h-4" />
+             New Lesson
+           </button>
+        </div>
+
         {/* Bottom Section */}
         <div>
           {/* Quick Status */}
@@ -124,7 +132,7 @@ export default function StaffPortalLayout({
             </div>
             <input
               type="text"
-              placeholder="Search staff, courses, schedules..."
+              placeholder="Search facilities or inventory..."
               className="w-full bg-slate-100 border-none rounded-full py-2.5 pl-11 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
             />
           </div>
@@ -136,20 +144,17 @@ export default function StaffPortalLayout({
               {/* Notification dot */}
               <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />
             </button>
-            <button className="text-slate-600 hover:text-slate-900 transition-colors">
-              <HelpCircle className="w-5 h-5" />
-            </button>
             <div className="w-px h-8 bg-slate-200 mx-2" />
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-slate-900 leading-tight">
-                  Staff Member
+                <p className="text-xs font-black text-slate-900 leading-tight uppercase tracking-tight">
+                  STAFF MEMBER
                 </p>
-                <p className="text-[10px] font-medium text-blue-600">
-                  Operations Staff
+                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">
+                  Operations Portal
                 </p>
               </div>
-              <div className="w-10 h-10 rounded-full border-2 border-blue-200 overflow-hidden shrink-0">
+              <div className="w-10 h-10 rounded-full border-2 border-blue-200 overflow-hidden shrink-0 shadow-sm">
                 <Image
                   src="https://i.pravatar.cc/100?img=33"
                   alt="Staff Profile"

@@ -429,7 +429,9 @@ INSERT INTO class_teachers (class_id, teacher_id) VALUES
 (5, 4), -- UPP → Ms. Thu Ha
 (6, 2), -- ADV → Ms. Lan Anh
 (7, 5), -- PRO → Mr. Van Duc
--- ── Tài khoản Staff & Teacher Test (Mật khẩu: "1") ─────────────────────
+(8, 5); -- EXP → Mr. Van Duc
+
+-- ── Tài khoản Staff & Teacher Test (Mật khẩu: "1") ──────────────────────
 INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
 (6, 'Nhân viên Vận hành', '0999888777', 'staff@f4forum.com', 'ACTIVE', 'STAFF'),
 (7, 'Giảng viên Demo', '0888777666', 'teacher@f4forum.com', 'ACTIVE', 'TEACHER');
@@ -440,4 +442,5 @@ INSERT INTO teachers (user_id, specialty, hire_date) VALUES (7, 'IELTS Specialis
 INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
 (6, 'staff', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STAFF'),
 (7, 'teacher', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_TEACHER');
+
 
