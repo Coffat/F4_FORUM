@@ -105,6 +105,7 @@ CREATE TABLE branches (
 );
 
 CREATE TABLE rooms (
+    version BIGINT DEFAULT 0,
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     branch_id BIGINT NOT NULL,
     name VARCHAR(100) NOT NULL,

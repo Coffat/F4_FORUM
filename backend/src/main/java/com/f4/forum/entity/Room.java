@@ -16,6 +16,9 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
@@ -29,8 +32,16 @@ public class Room {
     @Column(name = "room_type", length = 100)
     private String roomType;
 
-    // Package-private, only used by Branch to maintain bidirectional relationship
-    void assignToBranch(Branch branch) {
+    // --- Rich Domain Model: Business Behaviors ---
+
+    public void updateOperationalInfo(String name, Integer capacity, String roomType) {
+        if (name == null || name.isBlank()) throw new IllegalArgumentException("Room name cannot be empty");
+        this.name = name;
+        this.capacity = capacity;
+        this.roomType = roomType;
+    }
+
+    public void assignToBranch(Branch branch) {
         this.branch = branch;
     }
     

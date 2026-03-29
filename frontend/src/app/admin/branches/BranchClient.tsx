@@ -6,10 +6,11 @@ import {
   MapPin, Building2, Plus, 
   TrendingUp, Users, DollarSign, ChevronDown, 
   ArrowUpRight, Download, Edit2, Trash2,
-  Map as MapIcon, ChevronLeft, ChevronRight
+  Map as MapIcon, ChevronLeft, ChevronRight, DoorOpen
 } from "lucide-react";
 import Image from "next/image";
 import { createBranch, deleteBranch, updateBranch, type BranchCommandData } from "./actions";
+import RoomModal from "./components/RoomModal";
 
 interface Branch {
   id: number;
@@ -31,6 +32,7 @@ export default function BranchManagementClient({ initialList }: { initialList: B
   const [isPending, startTransition] = useTransition();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
+  const [roomModalId, setRoomModalId] = useState<number | null>(null);
 
   // Stats calculation
   const totalBranches = initialList.length;
@@ -148,8 +150,14 @@ export default function BranchManagementClient({ initialList }: { initialList: B
                             <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 flex items-center justify-center transition-all">
                                 <Building2 className="w-6 h-6" />
                             </div>
-                            <div>
-                                <h4 className="font-bold text-slate-900">{branch.name}</h4>
+                            <div 
+                                className="cursor-pointer group/name"
+                                onClick={() => setRoomModalId(branch.id)}
+                            >
+                                <h4 className="font-bold text-slate-900 group-hover/name:text-blue-600 transition-colors flex items-center gap-2">
+                                    {branch.name}
+                                    <DoorOpen className="w-3 h-3 opacity-0 group-hover/name:opacity-100 transition-all text-blue-500" />
+                                </h4>
                                 <p className="text-xs font-medium text-slate-400 mt-0.5">{branch.address}</p>
                             </div>
                         </div>
@@ -369,6 +377,15 @@ export default function BranchManagementClient({ initialList }: { initialList: B
                 </form>
             </div>
         </div>
+      )}
+
+      {/* Room Management Modal */}
+      {roomModalId && (
+        <RoomModal 
+          branchId={roomModalId} 
+          branchName={initialList.find(b => b.id === roomModalId)?.name || ""}
+          onClose={() => setRoomModalId(null)}
+        />
       )}
     </div>
   );

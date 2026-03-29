@@ -180,7 +180,67 @@ Xóa vĩnh viễn User và Account liên quan.
 
 ---
 
-## 👥 Personnel (Staff / Teachers directory)
+---
+
+## 🏢 4. Branch & Room Management Module
+
+Module quản lý hệ thống chi nhánh (Campus) và các phòng học (Rooms) bên trong từng chi nhánh.
+
+### Lấy danh sách chi nhánh (GetAll Branches)
+Lấy toàn bộ chi nhánh đang hoạt động.
+
+- **URL**: `/api/v1/branches`
+- **Method**: `GET`
+- **Auth required**: No (Development)
+
+#### Response - Thành công (HTTP 200 OK)
+Mảng JSON chứa các đối tượng `Branch`.
+
+*Ví dụ:*
+```json
+[
+  {
+    "id": 1,
+    "name": "Saigon Central",
+    "address": "District 1, HCM City",
+    "phone": "028-3911-2222",
+    "capacity": 450,
+    "status": "ACTIVE"
+  }
+]
+```
+
+### Quản lý Phòng học (Nested Rooms API)
+
+Các API này luôn đi kèm với `branchId` để xác định phạm vi chi nhánh.
+
+#### 1. Danh sách phòng theo chi nhánh
+- **URL**: `/api/v1/branches/{branchId}/rooms`
+- **Method**: `GET`
+
+#### 2. Tạo phòng mới
+- **URL**: `/api/v1/branches/{branchId}/rooms`
+- **Method**: `POST`
+- **Body**: 
+```json
+{
+  "name": "Phòng 105",
+  "capacity": 20,
+  "roomType": "Theory"
+}
+```
+
+#### 3. Cập nhật phòng
+- **URL**: `/api/v1/branches/{branchId}/rooms/{roomId}`
+- **Method**: `PUT`
+- **Body**: Tương tự Create Room.
+
+#### 4. Xóa phòng
+- **URL**: `/api/v1/branches/{branchId}/rooms/{roomId}`
+- **Method**: `DELETE`
+
+---
+*Cập nhật: 29/03/2026 bởi Antigravity AI*
 
 ### Danh sách nhân sự & giáo viên
 Trả về danh sách hợp nhất (Teacher + Staff), có thể tìm kiếm và lọc theo tab.
