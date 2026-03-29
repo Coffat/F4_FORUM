@@ -22,5 +22,13 @@ public record UpdateUserCommand(
 
     @NotNull(message = "Trạng thái không được để trống")
     @Schema(description = "Status (ACTIVE, INACTIVE, BANNED)", example = "ACTIVE")
-    UserStatus status
+    UserStatus status,
+    
+    // Optional properties for Teacher
+    @Schema(description = "Specialty (Teacher only)", example = "IELTS 8.0")
+    String specialty,
+    
+    // Optional properties for Staff
+    @Schema(description = "Department (Staff only)", example = "IT")
+    String department
 ) {}

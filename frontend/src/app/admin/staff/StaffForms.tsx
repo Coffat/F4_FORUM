@@ -4,40 +4,48 @@ import { useState } from 'react'
 import { 
   X, 
   UserPlus, 
-  CheckCircle2, 
   AlertCircle,
   Loader2,
   ChevronDown
 } from 'lucide-react'
-import { createUser, updateUser, deleteUser } from './user-actions'
+import { createStaff, updateStaff, deleteStaff } from './actions'
 import { EditIcon } from '@/components/icons/EditIcon'
 import { DeleteIcon } from '@/components/icons/DeleteIcon'
 
-interface User {
-  id: number
-  fullName: string
-  email: string
-  phone: string
-  userType: string
-  role: string
-  status: string
+interface StaffRole {
+    id: string;
+    label: string;
+    color: string;
+}
+
+interface StaffPerson {
+    id: number;
+    name: string;
+    joined: string;
+    avatar: string;
+    isActive: boolean;
+    roles: StaffRole[];
+    specialty?: string;
+    department?: string;
+    email: string;
+    phone: string;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    1. DELETE CONFIRMATION
    ───────────────────────────────────────────────────────────────────────────── */
-export function DeleteUserButton({ userId, userName, iconOnly = false }: { userId: number, userName: string, iconOnly?: boolean }) {
+export function DeleteStaffButton({ staffId, staffName, iconOnly = false }: { staffId: number, staffName: string, iconOnly?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async () => {
     setIsDeleting(true)
-    const res = await deleteUser(userId)
+    const res = await deleteStaff(staffId)
     setIsDeleting(false)
     if (res.success) {
       setIsOpen(false)
     } else {
-      alert(res.error || 'Failed to delete user')
+      alert(res.error || 'Failed to delete staff member')
     }
   }
 
@@ -45,7 +53,7 @@ export function DeleteUserButton({ userId, userName, iconOnly = false }: { userI
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        title="Delete User"
+        title="Delete Staff"
         className={iconOnly 
           ? "p-2 w-8 h-8 flex items-center justify-center rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors" 
           : "flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
@@ -65,7 +73,7 @@ export function DeleteUserButton({ userId, userName, iconOnly = false }: { userI
               </div>
               <h3 className="text-xl font-bold text-slate-900">Delete Account?</h3>
               <p className="text-slate-500 mt-2 text-sm leading-relaxed">
-                You are about to permanently delete <span className="font-bold text-slate-900">{userName}</span>. This action cannot be undone and will remove all associated login access.
+                You are about to permanently delete <span className="font-bold text-slate-900">{staffName}</span>. This action cannot be undone and will remove all associated login access.
               </p>
             </div>
             <div className="p-4 bg-slate-50 flex items-center justify-end gap-3 px-6">
@@ -94,10 +102,18 @@ export function DeleteUserButton({ userId, userName, iconOnly = false }: { userI
 /* ─────────────────────────────────────────────────────────────────────────────
    2. ADD / EDIT DIALOG
    ───────────────────────────────────────────────────────────────────────────── */
-export function UserFormModal({ mode = 'create', initialData, iconOnly = false }: { mode?: 'create' | 'edit', initialData?: User, iconOnly?: boolean }) {
+export function StaffFormModal({ mode = 'create', initialData, iconOnly = false }: { mode?: 'create' | 'edit', initialData?: StaffPerson, iconOnly?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Determine initial selected type
+  const isTeacherInitial = initialData?.roles?.some(r => r.label === 'TEACHER') || false;
+  const initialType = mode === 'edit' 
+    ? (isTeacherInitial ? 'TEACHER' : 'STAFF')
+    : 'TEACHER';
+
+  const [selectedType, setSelectedType] = useState(initialType);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -106,11 +122,16 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
     
     const formData = new FormData(e.currentTarget)
     const data = Object.fromEntries(formData)
+
+    // For create we also need role. It typically mirrors userType.
+    if (mode === 'create') {
+        data['role'] = selectedType === 'TEACHER' ? 'ROLE_TEACHER' : 'STAFF'; 
+    }
     
     // Create/Update call
     const res = mode === 'create' 
-      ? await createUser(data) 
-      : await updateUser(initialData!.id, data)
+      ? await createStaff(data) 
+      : await updateStaff(initialData!.id, data)
 
     setIsSubmitting(false)
     if (res.success) {
@@ -126,22 +147,22 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
       {mode === 'create' ? (
         <button 
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2 bg-[#0B3A9A] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-blue-800 transition-colors shadow-md shadow-blue-200 whitespace-nowrap"
+           className="flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-800 text-white px-6 py-3.5 rounded-xl font-bold transition-all shadow-md shadow-blue-200"
         >
-          <UserPlus className="w-4 h-4" />
-          Add New User
+          <PlusCircleIcon className="w-5 h-5" />
+          Add Staff Member
         </button>
       ) : (
         <button 
           onClick={() => setIsOpen(true)}
-          title="Edit User"
+          title="Edit Staff"
           className={iconOnly 
            ? "p-2 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" 
            : "flex items-center gap-2 w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium border-b border-slate-100"
           }
         >
           <EditIcon className="w-4 h-4" />
-          {!iconOnly && "Edit Basic Info"}
+          {!iconOnly && "Edit Profile"}
         </button>
       )}
 
@@ -153,8 +174,8 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
             {/* Header */}
             <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
-                <h3 className="text-xl font-bold text-slate-900">{mode === 'create' ? "Register New User" : "Update Account"}</h3>
-                <p className="text-xs text-slate-500 font-medium">Please fill in the official details for the system records.</p>
+                <h3 className="text-xl font-bold text-slate-900">{mode === 'create' ? "Register New Staff" : "Update Profile"}</h3>
+                <p className="text-xs text-slate-500 font-medium">Please fill in the official details for the personnel directory.</p>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
@@ -179,7 +200,7 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
                   <input 
                     name="fullName" 
                     required 
-                    defaultValue={initialData?.fullName}
+                    defaultValue={initialData?.name}
                     placeholder="Enter full name"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium" 
                   />
@@ -212,7 +233,7 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
                   <div className="relative">
                     <select 
                       name="status"
-                      defaultValue={initialData?.status || 'ACTIVE'}
+                      defaultValue={initialData?.isActive === false ? 'INACTIVE' : 'ACTIVE'}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium pr-10"
                     >
                       <option value="ACTIVE">Active Account</option>
@@ -224,9 +245,53 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
                 </div>
               </div>
 
+              <hr className="border-slate-100" />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Member Type</label>
+                      <div className="relative">
+                        <select 
+                          name="userType"
+                          value={selectedType}
+                          onChange={(e) => setSelectedType(e.target.value)}
+                          disabled={mode === 'edit'} // Usually, role changes shouldn't happen trivially in basic crud edit.
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium pr-10 disabled:opacity-50"
+                        >
+                          <option value="TEACHER">Academic (Teacher)</option>
+                          <option value="STAFF">Administrative (Staff)</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      </div>
+                  </div>
+
+                  {selectedType === 'TEACHER' && (
+                     <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Academic Specialty</label>
+                      <input 
+                        name="specialty" 
+                        defaultValue={initialData?.specialty}
+                        placeholder="e.g. Applied Phonetics"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium" 
+                      />
+                    </div>
+                  )}
+
+                  {selectedType === 'STAFF' && (
+                     <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Corporate Department</label>
+                      <input 
+                        name="department" 
+                        defaultValue={initialData?.department}
+                        placeholder="e.g. IT & Systems"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium" 
+                      />
+                    </div>
+                  )}
+              </div>
+
               {mode === 'create' && (
                 <>
-                  <hr className="border-slate-100" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Username</label>
@@ -238,46 +303,14 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Setup Password</label>
                       <input 
                         name="rawPassword" 
                         type="password"
                         required 
-                        placeholder="System password"
+                        placeholder="Initial password"
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium" 
                       />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Member Type</label>
-                      <div className="relative">
-                        <select 
-                          name="userType"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium pr-10"
-                        >
-                          <option value="STUDENT">Student Candidate</option>
-                          <option value="TEACHER">Official Instructor</option>
-                          <option value="STAFF">Management Staff</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div className="space-y-1.5 font-medium">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">System Role</label>
-                      <div className="relative">
-                        <select 
-                          name="role"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium pr-10"
-                        >
-                          <option value="ROLE_STUDENT">Student Role</option>
-                          <option value="ROLE_TEACHER">Instructor Role</option>
-                          <option value="STAFF">Staff Role</option>
-                          <option value="ROLE_ADMIN">System Administrator</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                      </div>
                     </div>
                   </div>
                 </>
@@ -295,7 +328,7 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
                 <button 
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-8 py-2.5 bg-[#0B3A9A] text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-800 transition-all flex items-center gap-2"
+                  className="px-8 py-2.5 bg-[#1d4ed8] text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-800 transition-all flex items-center gap-2"
                 >
                   {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === 'create' ? "Confirm Registration" : "Save Updates"}
                 </button>
@@ -306,4 +339,25 @@ export function UserFormModal({ mode = 'create', initialData, iconOnly = false }
       )}
     </>
   )
+}
+
+function PlusCircleIcon(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 12h8" />
+            <path d="M12 8v8" />
+        </svg>
+    )
 }

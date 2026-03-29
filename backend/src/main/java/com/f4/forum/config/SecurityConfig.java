@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/courses/**").permitAll()        // Courses (công khai)
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
                 .requestMatchers("/api/admin/**").permitAll()             // Admin functionalities (Until JWT Filter is set up)
+                .requestMatchers("/api/v1/personnel/**").permitAll()      // Personnel module
                 .anyRequest().authenticated()
             );
 
