@@ -110,7 +110,13 @@ CREATE TABLE courses (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     level VARCHAR(50),
-    fee DECIMAL(15, 2) NOT NULL DEFAULT 0.00
+    fee DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+    category VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'PUBLISHED',
+    max_enrollment INT DEFAULT 0,
+    current_enrollment INT DEFAULT 0,
+    image_url TEXT,
+    image_color VARCHAR(50)
 );
 
 -- --- OPERATIONS ---
