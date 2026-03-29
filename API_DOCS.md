@@ -198,3 +198,63 @@ Trả về danh sách hợp nhất (Teacher + Staff), có thể tìm kiếm và 
 ### Thống kê personnel (dashboard)
 - **URL**: `/api/v1/personnel/stats`
 - **Method**: `GET`
+
+---
+
+## 📊 5. Staff Dashboard Module
+
+Module cung cấp dữ liệu tổng hợp cho trang **Staff Operations Dashboard**, giảm số round-trip giữa FE và BE bằng cách trả về một JSON object duy nhất.
+
+### Lấy Metrics Tổng Hợp (Dashboard)
+
+- **URL**: `/api/v1/staff-dashboard/metrics`
+- **Method**: `GET`
+- **Auth required**: No (sẽ yêu cầu `ROLE_ADMIN` hoặc `ROLE_STAFF` sau khi bật JWT)
+- **Design Pattern**: Facade + Builder
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+{
+  "totalFaculty": 42,
+  "activeSessions": 18,
+  "onDutyRatio": "85%",
+  "activeStaffCount": 39,
+  "totalTeachers": 28,
+  "totalAdminStaff": 14,
+  "recentlyActive": [
+    {
+      "id": 5,
+      "name": "Trần Thị B",
+      "departmentOrSpecialty": "IELTS 8.5",
+      "roleLabel": "TEACHER",
+      "avatar": "https://i.pravatar.cc/100?u=teacher_5",
+      "isActive": true
+    },
+    {
+      "id": 12,
+      "name": "Nguyễn Văn C",
+      "departmentOrSpecialty": "Administration",
+      "roleLabel": "SUPPORT",
+      "avatar": "https://i.pravatar.cc/100?u=staff_12",
+      "isActive": true
+    }
+  ]
+}
+```
+
+#### Mô tả các trường
+
+| Trường | Kiểu | Mô tả |
+| :--- | :---: | :--- |
+| `totalFaculty` | Long | Tổng số giáo viên + nhân sự hành chính |
+| `activeSessions` | Long | Số lớp đang `OPEN` hoặc `IN_PROGRESS` |
+| `onDutyRatio` | String | Tỷ lệ giáo viên đang dạy / tổng giáo viên (vd: `"85%"`) |
+| `activeStaffCount` | Long | Tổng nhân sự có trạng thái `ACTIVE` |
+| `totalTeachers` | Long | Số giáo viên trong hệ thống |
+| `totalAdminStaff` | Long | Số nhân sự hành chính trong hệ thống |
+| `recentlyActive` | Array | Tối đa 5 nhân sự ACTIVE mới nhất (3 teachers + 2 staff) |
+
+---
+
+*Cập nhật: 29/03/2026 bởi Senior Backend Architect - Áp dụng Facade + Builder Pattern*
