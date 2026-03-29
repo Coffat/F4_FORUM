@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { logoutAction } from "../actions";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -13,11 +14,13 @@ import {
   Search,
   Bell,
   HelpCircle,
+  Activity,
 } from "lucide-react";
 import Image from "next/image";
 
 const SIDEBAR_LINKS = [
   { name: "DASHBOARD", icon: LayoutDashboard, href: "/admin" },
+  { name: "STAFF DASHBOARD", icon: Activity, href: "/admin/staff/dashboard" },
   { name: "USERS", icon: Users, href: "/admin/users" },
   { name: "STAFF", icon: Briefcase, href: "/admin/staff" },
   { name: "COURSES", icon: BookOpen, href: "/admin/courses" },
@@ -84,13 +87,15 @@ export default function AdminLayout({
               <Settings className="w-5 h-5" />
               SETTINGS
             </Link>
-            <Link
-              href="/logout"
-              className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              LOGOUT
-            </Link>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors w-full"
+              >
+                <LogOut className="w-5 h-5" />
+                LOGOUT
+              </button>
+            </form>
           </div>
         </div>
       </aside>

@@ -47,15 +47,44 @@ export async function loginAction(
   }
   
   const cookieStore = await cookies();
-  cookieStore.set('auth_token', resultToken, { 
-    httpOnly: true, 
+
+  // Lưu JWT token vào httpOnly cookie
+  cookieStore.set('auth_token', resultToken, {
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    path: '/'
+    path: '/',
+    maxAge: 60 * 60 * 24, // 1 ngày
   });
-  
-  if (resultRole === 'ROLE_ADMIN' || resultRole === 'STAFF') {
-    redirect('/admin');
-  } else {
-    redirect('/dashboard');
+
+  // Lưu role vào cookie (không httpOnly để middleware đọc được dễ hơn)
+  cookieStore.set('auth_role', resultRole, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 60 * 60 * 24, // 1 ngày
+  });
+
+  // Điều hướng đúng theo từng role từ backend enum AccountRole
+  switch (resultRole) {
+    case 'ROLE_ADMIN':
+      redirect('/admin');
+    case 'ROLE_STAFF':
+      redirect('/staff/dashboard');
+    case 'ROLE_TEACHER':
+      redirect('/'); // Chưa có route riêng cho teacher
+    case 'ROLE_STUDENT':
+      redirect('/'); // Chưa có route riêng cho student
+    default:
+      redirect('/login');
   }
+}
+
+/**
+ * Server Action: Đăng xuất — xóa cookie và redirect về trang login
+ */
+export async function logoutAction(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete('auth_token');
+  cookieStore.delete('auth_role');
+  redirect('/login');
 }
