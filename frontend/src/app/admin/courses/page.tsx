@@ -43,8 +43,11 @@ export default function CoursesPage() {
            fetch("http://localhost:8080/api/v1/courses/stats")
         ]);
         
-        const coursesData = await coursesRes.json();
-        const statsData = await statsRes.json();
+        const coursesText = await coursesRes.text();
+        const statsText = await statsRes.text();
+        
+        const coursesData = coursesText ? JSON.parse(coursesText) : {};
+        const statsData = statsText ? JSON.parse(statsText) : {};
         
         // Map backend DTO to matching UI fields
         const mappedCourses = (coursesData.content || []).map((c: any) => ({
