@@ -7,8 +7,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,12 +27,17 @@ public class PersonnelController {
     private final PersonnelService personnelService;
 
     @GetMapping
-    @Operation(summary = "Get all personnel", description = "Retrieves a unified list of teachers and staff members")
+    @Operation(summary = "Get all personnel", description = "Retrieves teachers and staff; optional search (name, email, phone, specialty/dept) and segment (ALL, ACADEMIC, ADMINISTRATIVE).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved directory list")
     })
-    public ResponseEntity<List<StaffDirectoryResponse>> getAllPersonnel() {
-        return ResponseEntity.ok(personnelService.getStaffDirectory());
+    public ResponseEntity<List<StaffDirectoryResponse>> getAllPersonnel(
+            @Parameter(description = "Case-insensitive partial match on name, email, phone, or specialty/department")
+            @RequestParam(required = false) String search,
+            @Parameter(description = "ALL | ACADEMIC (teachers only) | ADMINISTRATIVE (staff only)")
+            @RequestParam(required = false, defaultValue = "ALL") String segment
+    ) {
+        return ResponseEntity.ok(personnelService.getStaffDirectory(search, segment));
     }
 
     @GetMapping("/stats")

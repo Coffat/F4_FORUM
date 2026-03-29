@@ -21,8 +21,13 @@ public class UserManagementFacade {
         this.userCommandService = userCommandService;
     }
 
-    public Page<UserDirectoryResponse> fetchUserDirectory(String query, Pageable pageable) {
-        return userQueryService.getUserDirectory(query, pageable);
+    public Page<UserDirectoryResponse> fetchUserDirectory(
+            String query,
+            String userType,
+            String status,
+            String role,
+            Pageable pageable) {
+        return userQueryService.getUserDirectory(query, userType, status, role, pageable);
     }
 
     public UserMetricsResponse calculateMetrics() {
