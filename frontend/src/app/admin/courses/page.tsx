@@ -13,6 +13,7 @@ import {
   MoreHorizontal
 } from "lucide-react";
 import { CourseFormModal, CourseTableRowActions } from "./CourseForms";
+import { getCourseCatalog, getCourseStats } from "./course-actions";
 
 interface Course {
   id: string; // Using code for display
@@ -38,13 +39,21 @@ export default function CoursesPage() {
   const fetchData = async () => {
       try {
         setLoading(true);
-        const [coursesRes, statsRes] = await Promise.all([
-           fetch("http://localhost:8080/api/v1/courses"),
-           fetch("http://localhost:8080/api/v1/courses/stats")
+        const [coursesResult, statsResult] = await Promise.all([
+          getCourseCatalog(),
+          getCourseStats()
         ]);
-        
-        const coursesData = await coursesRes.json();
-        const statsData = await statsRes.json();
+
+        if (!("success" in coursesResult) || !("success" in statsResult)) {
+          throw new Error(
+            ("error" in coursesResult && coursesResult.error) ||
+              ("error" in statsResult && statsResult.error) ||
+              "Failed to load courses data"
+          );
+        }
+
+        const coursesData = coursesResult.data || {};
+        const statsData = statsResult.data || {};
         
         // Map backend DTO to matching UI fields
         const mappedCourses = (coursesData.content || []).map((c: any) => ({
