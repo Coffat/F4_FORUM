@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
                 .requestMatchers("/api/admin/**").permitAll()             // Admin functionalities (Until JWT Filter is set up)
                 .requestMatchers("/api/v1/personnel/**").permitAll()      // Personnel module
+                .requestMatchers("/api/v1/staff-dashboard/**").permitAll() // Staff Dashboard metrics
                 .anyRequest().authenticated()
             );
 
