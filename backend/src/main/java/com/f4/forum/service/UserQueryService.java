@@ -27,9 +27,14 @@ public class UserQueryService {
     /**
      * Get a paginated list of users joined with their accounts to avoid N+1 queries.
      * Uses Spring Data Pageable directly for clean slice requests.
+     * Chuỗi rỗng / chỉ khoảng trắng được chuẩn hóa thành null để khớp điều kiện JPQL (tìm toàn bộ),
+     * phù hợp khi client gửi tìm kiếm theo từng ký tự (debounce).
      */
     public Page<UserDirectoryResponse> getUserDirectory(String searchTerm, Pageable pageable) {
-        return userRepository.findUserDirectory(searchTerm, pageable);
+        String normalized = (searchTerm == null || searchTerm.isBlank())
+                ? null
+                : searchTerm.trim();
+        return userRepository.findUserDirectory(normalized, pageable);
     }
 
     /**

@@ -117,7 +117,7 @@ Tìm kiếm và phân trang toàn bộ người dùng trong hệ thống.
 #### Query Parameters
 | Tham số | Kiểu dữ liệu | Mô tả |
 | :--- | :---: | :--- |
-| `search` | String | Tìm kiếm theo Tên hoặc Email |
+| `search` | String | Tìm kiếm theo Tên hoặc Email (khớp một phần, không phân biệt hoa thường). Chuỗi rỗng hoặc chỉ khoảng trắng được coi như không lọc. Trên UI admin, client debounce (~350ms) và cập nhật URL khi người dùng gõ. |
 | `page` | Integer | Số trang (0-indexed) |
 | `size` | Integer | Số lượng bản ghi mỗi trang |
 

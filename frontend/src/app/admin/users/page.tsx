@@ -2,8 +2,6 @@ import {
   Users, 
   ShieldCheck, 
   UserX, 
-  UserPlus, 
-  Search, 
   Filter, 
   MoreVertical, 
   Mail, 
@@ -14,9 +12,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { UserFormModal } from "./UserForms";
 import { UserTableRowActions } from "./UserActions";
+import { UserDirectorySearch } from "./UserDirectorySearch";
 
 // Types mapping to Backend DTOs
 interface UserDirectoryResponse {
@@ -169,19 +169,13 @@ export default async function UserManagementPage({
             <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/50">
                <h3 className="text-lg font-bold text-slate-900 w-full sm:w-auto">User Directory</h3>
                <div className="flex items-center gap-3 w-full sm:w-auto">
-                 {/* Search Form - Using native GET method to leverage SSR params */}
-                 <form className="relative flex-1 sm:w-64" action="/admin/users" method="GET">
-                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                     <Search className="h-4 w-4 text-slate-400" />
-                   </div>
-                   <input
-                     type="text"
-                     name="search"
-                     defaultValue={searchTerm}
-                     placeholder="Search name, email..."
-                     className="w-full bg-white border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-medium"
-                   />
-                 </form>
+                 <Suspense
+                   fallback={
+                     <div className="flex-1 sm:w-64 h-10 rounded-xl border border-slate-200 bg-white animate-pulse" />
+                   }
+                 >
+                   <UserDirectorySearch initialSearch={searchTerm} />
+                 </Suspense>
                  {/* Filter */}
                  <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-50 transition-colors shadow-sm shrink-0">
                    <Filter className="w-4 h-4" />

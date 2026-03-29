@@ -35,7 +35,7 @@ public class AdminUserController {
     })
     @GetMapping
     public ResponseEntity<Page<UserDirectoryResponse>> getUserDirectory(
-            @Parameter(description = "Search term for emails and full names") 
+            @Parameter(description = "Partial match on full name or email (case-insensitive). Blank/whitespace is treated as no filter; typical client sends debounced keystrokes.")
             @RequestParam(required = false) String search,
             @PageableDefault(size = 20) Pageable pageable
     ) {

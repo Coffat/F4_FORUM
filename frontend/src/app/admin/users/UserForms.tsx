@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { 
   X, 
   UserPlus, 
@@ -22,6 +22,9 @@ interface User {
   role: string
   status: string
 }
+
+type CreateMemberType = 'STUDENT' | 'TEACHER' | 'STAFF'
+type StaffRoleChoice = 'ROLE_STAFF' | 'ROLE_ADMIN'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    1. DELETE CONFIRMATION
@@ -94,6 +97,16 @@ export function UserFormModal({ mode = 'create', initialData }: { mode?: 'create
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  /** Luồng tạo user: Student/Teacher khóa role; Staff chọn ROLE_STAFF hoặc ROLE_ADMIN */
+  const [memberType, setMemberType] = useState<CreateMemberType>('STUDENT')
+  const [staffRoleChoice, setStaffRoleChoice] = useState<StaffRoleChoice>('ROLE_STAFF')
+
+  useEffect(() => {
+    if (isOpen && mode === 'create') {
+      setMemberType('STUDENT')
+      setStaffRoleChoice('ROLE_STAFF')
+    }
+  }, [isOpen, mode])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -245,8 +258,10 @@ export function UserFormModal({ mode = 'create', initialData }: { mode?: 'create
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Member Type</label>
                       <div className="relative">
-                        <select 
+                        <select
                           name="userType"
+                          value={memberType}
+                          onChange={(e) => setMemberType(e.target.value as CreateMemberType)}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium pr-10"
                         >
                           <option value="STUDENT">Student Candidate</option>
@@ -258,18 +273,38 @@ export function UserFormModal({ mode = 'create', initialData }: { mode?: 'create
                     </div>
                     <div className="space-y-1.5 font-medium">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">System Role</label>
-                      <div className="relative">
-                        <select 
-                          name="role"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium pr-10"
-                        >
-                          <option value="ROLE_STUDENT">Student Role</option>
-                          <option value="ROLE_TEACHER">Instructor Role</option>
-                          <option value="STAFF">Staff Role</option>
-                          <option value="ROLE_ADMIN">System Administrator</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                      </div>
+                      {memberType === 'STUDENT' && (
+                        <>
+                          <input type="hidden" name="role" value="ROLE_STUDENT" />
+                          <div className="w-full bg-slate-100 border border-slate-200 rounded-xl py-2.5 px-4 text-sm text-slate-700">
+                            Student Role{' '}
+                            <span className="text-slate-400 font-normal">(default for this member type)</span>
+                          </div>
+                        </>
+                      )}
+                      {memberType === 'TEACHER' && (
+                        <>
+                          <input type="hidden" name="role" value="ROLE_TEACHER" />
+                          <div className="w-full bg-slate-100 border border-slate-200 rounded-xl py-2.5 px-4 text-sm text-slate-700">
+                            Instructor Role{' '}
+                            <span className="text-slate-400 font-normal">(default for this member type)</span>
+                          </div>
+                        </>
+                      )}
+                      {memberType === 'STAFF' && (
+                        <div className="relative">
+                          <select
+                            name="role"
+                            value={staffRoleChoice}
+                            onChange={(e) => setStaffRoleChoice(e.target.value as StaffRoleChoice)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm appearance-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none font-medium pr-10"
+                          >
+                            <option value="ROLE_STAFF">Staff Role</option>
+                            <option value="ROLE_ADMIN">System Administrator</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </>
