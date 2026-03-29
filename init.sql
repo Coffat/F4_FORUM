@@ -1,3 +1,7 @@
+-- Thiết lập bảng mã UTF-8 để hiển thị đúng tiếng Việt
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- Tắt kiểm tra khóa ngoại để thuận tiện cho việc DROP
 SET FOREIGN_KEY_CHECKS = 0;
 
