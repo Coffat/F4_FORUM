@@ -14,20 +14,72 @@ async function getAuthHeader() {
   };
 }
 
-export async function createCourse(data: any) {
+async function parseApiResponse(res: Response) {
+  const text = await res.text();
+  if (res.ok) {
+    return { ok: true as const, text };
+  }
+  let detail = text?.trim() || `HTTP ${res.status}`;
+  try {
+    const json = JSON.parse(text) as { message?: string };
+    if (json.message) detail = json.message;
+  } catch {
+    // Keep plain text body from backend
+  }
+  return { ok: false as const, detail };
+}
+
+export async function getCourseCatalog() {
+  try {
+    const res = await fetch(BE_URL, {
+      method: 'GET',
+      headers: await getAuthHeader(),
+      cache: 'no-store'
+    });
+    const parsed = await parseApiResponse(res);
+    if (!parsed.ok) {
+      return { error: parsed.detail };
+    }
+    const data = parsed.text?.trim() ? JSON.parse(parsed.text) : {};
+    return { success: true, data };
+  } catch {
+    return { error: 'Backend connection failed' };
+  }
+}
+
+export async function getCourseStats() {
+  try {
+    const res = await fetch(`${BE_URL}/stats`, {
+      method: 'GET',
+      headers: await getAuthHeader(),
+      cache: 'no-store'
+    });
+    const parsed = await parseApiResponse(res);
+    if (!parsed.ok) {
+      return { error: parsed.detail };
+    }
+    const data = parsed.text?.trim() ? JSON.parse(parsed.text) : {};
+    return { success: true, data };
+  } catch {
+    return { error: 'Backend connection failed' };
+  }
+}
+
+export async function createCourse(data: Record<string, unknown>) {
   try {
     const res = await fetch(BE_URL, {
       method: 'POST',
       headers: await getAuthHeader(),
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      cache: 'no-store'
     });
-    if (!res.ok) {
-      const msg = await res.text();
-      return { error: msg || 'Failed to create course' };
+    const parsed = await parseApiResponse(res);
+    if (!parsed.ok) {
+      return { error: parsed.detail || 'Failed to create course' };
     }
     revalidatePath('/admin/courses');
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: 'Backend connection failed' };
   }
 }
@@ -39,12 +91,13 @@ export async function updateCourse(id: number, data: any) {
       headers: await getAuthHeader(),
       body: JSON.stringify(data)
     });
-    if (!res.ok) {
-      return { error: 'Failed to update course' };
+    const parsed = await parseApiResponse(res);
+    if (!parsed.ok) {
+      return { error: parsed.detail || 'Failed to update course' };
     }
     revalidatePath('/admin/courses');
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: 'Backend connection failed' };
   }
 }
@@ -55,12 +108,13 @@ export async function deleteCourse(id: number) {
       method: 'DELETE',
       headers: await getAuthHeader()
     });
-    if (!res.ok) {
-      return { error: 'Failed to archive course' };
+    const parsed = await parseApiResponse(res);
+    if (!parsed.ok) {
+      return { error: parsed.detail || 'Failed to archive course' };
     }
     revalidatePath('/admin/courses');
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: 'Backend connection failed' };
   }
 }
