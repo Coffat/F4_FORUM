@@ -2,6 +2,8 @@ package com.f4.forum.service;
 
 import com.f4.forum.dto.request.CreateUserCommand;
 import com.f4.forum.dto.request.UpdateUserCommand;
+import com.f4.forum.entity.StaffMember;
+import com.f4.forum.entity.Teacher;
 import com.f4.forum.entity.User;
 import com.f4.forum.entity.UserAccount;
 import com.f4.forum.repository.UserAccountRepository;
@@ -52,6 +54,12 @@ public class UserCommandService {
         // Rich Domain Model: Cập nhật qua setter an toàn
         user.updateBasicInfo(command.fullName(), command.status());
         user.updateContact(command.phone(), command.email());
+
+        if (user instanceof Teacher teacher && command.specialty() != null) {
+            teacher.updateSpecialty(command.specialty());
+        } else if (user instanceof StaffMember staff && command.department() != null) {
+            staff.transferDepartment(command.department());
+        }
         
         userRepository.save(user);
     }
