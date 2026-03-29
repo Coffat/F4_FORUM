@@ -50,6 +50,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()          // Auth (đăng nhập)
                 .requestMatchers("/api/v1/courses/**").permitAll()        // Courses (công khai)
                 .requestMatchers("/api/v1/branches/**").permitAll()       // Branches (công khai cho dev)
+                .requestMatchers("/api/v1/rooms/**").permitAll()          // Rooms API (mới thêm)
+                .requestMatchers("/api/v1/classes/**").permitAll()        // Classes module
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
                 .requestMatchers("/api/admin/**").permitAll()             // Admin functionalities (Until JWT Filter is set up)
                 .requestMatchers("/api/v1/personnel/**").permitAll()      // Personnel module

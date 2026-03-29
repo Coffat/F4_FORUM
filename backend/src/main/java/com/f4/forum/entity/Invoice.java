@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.Builder;
 
 @Entity
 @Table(name = "invoices")
@@ -28,9 +29,11 @@ public class Invoice {
     private Student student;
 
     @Column(name = "base_amount", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal baseAmount = BigDecimal.ZERO;
 
     @Column(name = "final_amount", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal finalAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
@@ -41,6 +44,7 @@ public class Invoice {
     private LocalDate dueDate;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<InvoiceDetail> details = new ArrayList<>();
 
     @ManyToMany
@@ -49,6 +53,7 @@ public class Invoice {
         joinColumns = @JoinColumn(name = "invoice_id"),
         inverseJoinColumns = @JoinColumn(name = "promotion_id")
     )
+    @Builder.Default
     private Set<Promotion> promotions = new HashSet<>();
 
     @Version

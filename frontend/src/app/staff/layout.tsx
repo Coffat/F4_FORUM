@@ -15,11 +15,13 @@ import {
   Settings,
   ClipboardList,
   Activity,
+  GraduationCap,
 } from "lucide-react";
 import Image from "next/image";
 
 const STAFF_NAV = [
   { name: "MY DASHBOARD", icon: LayoutDashboard, href: "/staff/dashboard" },
+  { name: "CLASSES", icon: GraduationCap, href: "/staff/classes" },
   { name: "DIRECTORY", icon: Users, href: "/staff/directory" },
   { name: "SCHEDULES", icon: Calendar, href: "/staff/schedules" },
   { name: "COURSES", icon: BookOpen, href: "/courses" },

@@ -2,6 +2,7 @@ package com.f4.forum.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -28,12 +29,15 @@ public class InvoiceDetail {
     private String description;
 
     @Column(name = "unit_price", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal unitPrice = BigDecimal.ZERO;
 
     @Column(name = "discount_amount", precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
     @Column(name = "final_price", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal finalPrice = BigDecimal.ZERO;
 
     // Package-private

@@ -16,6 +16,7 @@ import {
   Bell,
   HelpCircle,
   Activity,
+  GraduationCap,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -26,6 +27,7 @@ const SIDEBAR_LINKS = [
   { name: "STAFF", icon: Briefcase, href: "/admin/staff" },
   { name: "BRANCHES", icon: MapPin, href: "/admin/branches" },
   { name: "COURSES", icon: BookOpen, href: "/admin/courses" },
+  { name: "CLASSES", icon: GraduationCap, href: "/admin/classes" },
 ];
 
 export default function AdminLayout({

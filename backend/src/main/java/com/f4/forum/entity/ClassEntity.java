@@ -3,32 +3,33 @@ package com.f4.forum.entity;
 import com.f4.forum.entity.enums.ClassStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Formula;
+
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "classes")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder(toBuilder = true)
 public class ClassEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
+    @Version
+    private Long version;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "default_room_id")
-    private Room defaultRoom;
-
-    @Column(name = "class_code", nullable = false, unique = true, length = 50)
+    @Column(name = "class_code", unique = true, nullable = false, length = 50)
     private String classCode;
 
     @Column(name = "start_date")
@@ -41,37 +42,48 @@ public class ClassEntity {
     private Integer maxStudents;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private ClassStatus status;
+    @Column(name = "status", length = 50)
+    @Builder.Default
+    private ClassStatus status = ClassStatus.OPEN;
 
-    @ManyToMany
-    @JoinTable(
-        name = "class_teachers",
-        joinColumns = @JoinColumn(name = "class_id"),
-        inverseJoinColumns = @JoinColumn(name = "teacher_id")
-    )
-    private Set<Teacher> teachers = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
-    @Version
-    private Long version;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "default_room_id")
+    private Room defaultRoom;
 
-    // Rich Domain Model
-    public void addTeacher(Teacher teacher) {
-        this.teachers.add(teacher);
-    }
+    // Tính số học viên hiện tại trực tiếp bằng SQL subquery — tránh N+1
+    @Formula("(SELECT COUNT(e.id) FROM enrollments e WHERE e.class_id = id AND e.status = 'ENROLLED')")
+    private Integer currentEnrollment;
 
-    public void removeTeacher(Teacher teacher) {
-        this.teachers.remove(teacher);
-    }
+    // Quan hệ 1-Nhiều với Enrollment — dùng cho Rich Domain Methods (không load khi query danh sách)
+    @OneToMany(mappedBy = "classEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Enrollment> enrollments = new ArrayList<>();
 
+    // ==========================================
+    // RICH DOMAIN MODEL - NGHIỆP VỤ LÕI
+    // ==========================================
+
+    /**
+     * Hủy lớp học: Chỉ cho phép hủy nếu chưa có học viên nào được enroll.
+     * Áp dụng nguyên lý Tell, Don't Ask.
+     */
     public void cancelClass() {
+        if (this.enrollments != null && !this.enrollments.isEmpty()) {
+            throw new IllegalStateException("Không thể hủy lớp học đã có học viên ghi danh.");
+        }
         this.status = ClassStatus.CANCELLED;
     }
-    
-    public void startClass() {
-        if (LocalDate.now().isBefore(startDate)) {
-            throw new IllegalStateException("Cannot start class before start date");
-        }
-        this.status = ClassStatus.IN_PROGRESS;
+
+    /**
+     * Kiểm tra điều kiện cho phép ghi danh
+     * @return true nếu Lớp có trạng thái OPEN và số sinh viên hiện tại < maxStudents
+     */
+    public boolean canEnroll() {
+        int currentEnrollment = this.enrollments != null ? this.enrollments.size() : 0;
+        return this.status == ClassStatus.OPEN && currentEnrollment < this.maxStudents;
     }
 }
