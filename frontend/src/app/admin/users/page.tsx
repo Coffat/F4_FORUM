@@ -2,21 +2,20 @@ import {
   Users, 
   ShieldCheck, 
   UserX, 
-  Filter, 
-  MoreVertical, 
   Mail, 
   Phone,
   ArrowUpRight,
   ShieldAlert,
   GraduationCap
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { UserFormModal } from "./UserForms";
 import { UserTableRowActions } from "./UserActions";
 import { UserDirectorySearch } from "./UserDirectorySearch";
+import { UserDirectoryFilters } from "./UserDirectoryFilters";
+import { buildAdminUsersPath, buildUsersApiQueryString } from "./user-directory-url";
 
 // Types mapping to Backend DTOs
 interface UserDirectoryResponse {
@@ -52,23 +51,40 @@ export default async function UserManagementPage({
   const params = await searchParams;
   const page = typeof params.page === 'string' ? params.page : '0';
   const searchTerm = typeof params.search === 'string' ? params.search : '';
+  const userType = typeof params.userType === 'string' ? params.userType : '';
+  const status = typeof params.status === 'string' ? params.status : '';
+  const role = typeof params.role === 'string' ? params.role : '';
+
+  const usersQuery = buildUsersApiQueryString({
+    page,
+    size: '20',
+    search: searchTerm,
+    userType,
+    status,
+    role,
+  });
 
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
 
-  const headers = { 
-    'Authorization': `Bearer ${token || ''}`,
+  const headers: Record<string, string> = { 
     'Content-Type': 'application/json'
   };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   // Safe fetch function
   async function fetchWithAuth(url: string) {
-    if (!token) return null;
     try {
       const res = await fetch(url, { headers, cache: 'no-store' });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        console.error(`Fetch error ${res.status} for ${url}`);
+        return null;
+      }
       return res.json();
-    } catch {
+    } catch (err) {
+      console.error(`Fetch exception for ${url}:`, err);
       return null;
     }
   }
@@ -76,7 +92,7 @@ export default async function UserManagementPage({
   // Fetch Metrics & User Directory in parallel
   const [metrics, usersPage] = await Promise.all([
     fetchWithAuth('http://localhost:8080/api/admin/users/metrics') as Promise<UserMetricsResponse | null>,
-    fetchWithAuth(`http://localhost:8080/api/admin/users?page=${page}&size=20${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`) as Promise<PaginatedResponse | null>
+    fetchWithAuth(`http://localhost:8080/api/admin/users?${usersQuery}`) as Promise<PaginatedResponse | null>
   ]);
 
   const METRIC_CARDS = metrics ? [
@@ -176,11 +192,13 @@ export default async function UserManagementPage({
                  >
                    <UserDirectorySearch initialSearch={searchTerm} />
                  </Suspense>
-                 {/* Filter */}
-                 <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-50 transition-colors shadow-sm shrink-0">
-                   <Filter className="w-4 h-4" />
-                   <span className="hidden sm:inline">Filters</span>
-                 </button>
+                 <Suspense
+                   fallback={
+                     <div className="h-10 w-24 rounded-xl border border-slate-200 bg-white animate-pulse shrink-0" />
+                   }
+                 >
+                   <UserDirectoryFilters />
+                 </Suspense>
                </div>
             </div>
 
@@ -306,7 +324,13 @@ export default async function UserManagementPage({
                   <div className="flex items-center gap-1">
                      {usersPage.number > 0 ? (
                        <Link 
-                         href={`/admin/users?page=${usersPage.number - 1}${searchTerm ? `&search=${searchTerm}` : ''}`}
+                         href={buildAdminUsersPath({
+                           page: usersPage.number - 1,
+                           search: searchTerm || undefined,
+                           userType: userType || undefined,
+                           status: status || undefined,
+                           role: role || undefined,
+                         })}
                          className="px-3 py-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                        >
                          Previous
@@ -319,7 +343,13 @@ export default async function UserManagementPage({
                      
                      {usersPage.number < usersPage.totalPages - 1 ? (
                        <Link 
-                         href={`/admin/users?page=${usersPage.number + 1}${searchTerm ? `&search=${searchTerm}` : ''}`}
+                         href={buildAdminUsersPath({
+                           page: usersPage.number + 1,
+                           search: searchTerm || undefined,
+                           userType: userType || undefined,
+                           status: status || undefined,
+                           role: role || undefined,
+                         })}
                          className="px-3 py-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                        >
                          Next

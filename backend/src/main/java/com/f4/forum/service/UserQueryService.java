@@ -2,6 +2,7 @@ package com.f4.forum.service;
 
 import com.f4.forum.dto.response.UserDirectoryResponse;
 import com.f4.forum.dto.response.UserMetricsResponse;
+import com.f4.forum.entity.enums.AccountRole;
 import com.f4.forum.entity.enums.UserStatus;
 import com.f4.forum.entity.enums.UserType;
 import com.f4.forum.repository.UserRepository;
@@ -30,11 +31,31 @@ public class UserQueryService {
      * Chuỗi rỗng / chỉ khoảng trắng được chuẩn hóa thành null để khớp điều kiện JPQL (tìm toàn bộ),
      * phù hợp khi client gửi tìm kiếm theo từng ký tự (debounce).
      */
-    public Page<UserDirectoryResponse> getUserDirectory(String searchTerm, Pageable pageable) {
+    public Page<UserDirectoryResponse> getUserDirectory(
+            String searchTerm,
+            String userTypeFilter,
+            String statusFilter,
+            String roleFilter,
+            Pageable pageable) {
         String normalized = (searchTerm == null || searchTerm.isBlank())
                 ? null
                 : searchTerm.trim();
-        return userRepository.findUserDirectory(normalized, pageable);
+        UserType userType = parseEnum(userTypeFilter, UserType.class);
+        UserStatus status = parseEnum(statusFilter, UserStatus.class);
+        AccountRole role = parseEnum(roleFilter, AccountRole.class);
+        return userRepository.findUserDirectory(normalized, userType, status, role, pageable);
+    }
+
+    /** Giá trị không hợp lệ được bỏ qua (coi như không lọc) để URL client an toàn. */
+    private static <E extends Enum<E>> E parseEnum(String raw, Class<E> type) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return Enum.valueOf(type, raw.trim());
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 
     /**

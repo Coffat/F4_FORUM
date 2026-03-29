@@ -95,7 +95,13 @@ CREATE TABLE branches (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address TEXT,
-    phone VARCHAR(20)
+    phone VARCHAR(20),
+    manager_id BIGINT,
+    capacity INT DEFAULT 500,
+    current_enrollment INT DEFAULT 0,
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+    version BIGINT DEFAULT 0,
+    FOREIGN KEY (manager_id) REFERENCES users(id)
 );
 
 CREATE TABLE rooms (
@@ -114,7 +120,13 @@ CREATE TABLE courses (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     level VARCHAR(50),
-    fee DECIMAL(15, 2) NOT NULL DEFAULT 0.00
+    fee DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+    category VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'PUBLISHED',
+    max_enrollment INT DEFAULT 0,
+    current_enrollment INT DEFAULT 0,
+    image_url TEXT,
+    image_color VARCHAR(50)
 );
 
 -- --- OPERATIONS ---
@@ -325,19 +337,6 @@ VALUES (1, 'IT Administration');
 INSERT INTO user_accounts (user_id, username, password_hash, role)
 VALUES (1, 'admin', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_ADMIN');
 
--- ── Chi Nhánh ─────────────────────────────────────────────────────────
-INSERT INTO branches (id, name, address, phone) VALUES
-(1, 'F4 Forum – Hồ Chí Minh (Quận 1)',  '123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.HCM', '028-3911-2222'),
-(2, 'F4 Forum – Hà Nội (Đống Đa)',       '88 Hoàng Cầu, Phường Ô Chợ Dừa, Quận Đống Đa, Hà Nội', '024-3927-4455');
-
--- ── Phòng Học ─────────────────────────────────────────────────────────
-INSERT INTO rooms (id, branch_id, name, capacity, room_type) VALUES
-(1, 1, 'Phòng 101 – Lớp Nhỏ',     15, 'CLASSROOM'),
-(2, 1, 'Phòng 201 – Lớp Trung',   25, 'CLASSROOM'),
-(3, 1, 'Phòng 301 – Hội Thảo',    40, 'SEMINAR'),
-(4, 1, 'Phòng 401 – Speaking Lab', 12, 'LAB'),
-(5, 2, 'Phòng A01 – Lớp Nhỏ',     15, 'CLASSROOM'),
-(6, 2, 'Phòng A02 – Lớp Trung',   25, 'CLASSROOM');
 
 -- ── Giáo Viên ─────────────────────────────────────────────────────────
 INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
@@ -351,6 +350,21 @@ INSERT INTO teachers (user_id, specialty, hire_date) VALUES
 (3, 'IELTS General, Business English – Band 8.0', '2019-09-15'),
 (4, 'Academic Writing, IELTS Writing – Band 8.5', '2021-06-01'),
 (5, 'IELTS Expert, Speaking Coach – Band 9.0',     '2018-01-10');
+
+-- ── Chi Nhánh ─────────────────────────────────────────────────────────
+INSERT INTO branches (id, name, address, phone, manager_id, capacity, current_enrollment, status) VALUES
+(1, 'Saigon Central',  'District 1, HCM City', '028-3911-2222', 2, 450, 385, 'ACTIVE'),
+(2, 'Hanoi West',       'Cau Giay, Hanoi', '024-3927-4455', 4, 300, 120, 'MAINTENANCE'),
+(3, 'Da Nang Coast',    'Ngu Hanh Son, Da Nang', '0511-3822-333', 1, 250, 210, 'ACTIVE');
+
+-- ── Phòng Học ─────────────────────────────────────────────────────────
+INSERT INTO rooms (id, branch_id, name, capacity, room_type) VALUES
+(1, 1, 'Phòng 101 – Lớp Nhỏ',     15, 'CLASSROOM'),
+(2, 1, 'Phòng 201 – Lớp Trung',   25, 'CLASSROOM'),
+(3, 1, 'Phòng 301 – Hội Thảo',    40, 'SEMINAR'),
+(4, 1, 'Phòng 401 – Speaking Lab', 12, 'LAB'),
+(5, 2, 'Phòng A01 – Lớp Nhỏ',     15, 'CLASSROOM'),
+(6, 2, 'Phòng A02 – Lớp Trung',   25, 'CLASSROOM');
 
 -- ── Khóa Học IELTS (8 level – từ căn bản đến Band 8.0+) ──────────────
 INSERT INTO courses (id, code, name, description, level, fee) VALUES

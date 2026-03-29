@@ -118,6 +118,9 @@ Tìm kiếm và phân trang toàn bộ người dùng trong hệ thống.
 | Tham số | Kiểu dữ liệu | Mô tả |
 | :--- | :---: | :--- |
 | `search` | String | Tìm kiếm theo Tên hoặc Email (khớp một phần, không phân biệt hoa thường). Chuỗi rỗng hoặc chỉ khoảng trắng được coi như không lọc. Trên UI admin, client debounce (~350ms) và cập nhật URL khi người dùng gõ. |
+| `userType` | String | Lọc đúng loại user: `STUDENT` \| `TEACHER` \| `STAFF`. Bỏ qua nếu không gửi. |
+| `status` | String | Lọc đúng trạng thái: `ACTIVE` \| `INACTIVE` \| `SUSPENDED`. Bỏ qua nếu không gửi. |
+| `role` | String | Lọc đúng role tài khoản: `ROLE_STUDENT` \| `ROLE_TEACHER` \| `ROLE_STAFF` \| `ROLE_ADMIN`. Bỏ qua nếu không gửi. |
 | `page` | Integer | Số trang (0-indexed) |
 | `size` | Integer | Số lượng bản ghi mỗi trang |
 
@@ -174,3 +177,24 @@ Xóa vĩnh viễn User và Account liên quan.
 - **URL**: `/api/admin/users/{id}`
 - **Method**: `DELETE`
 - **Auth required**: Yes (ROLE_ADMIN)
+
+---
+
+## 👥 Personnel (Staff / Teachers directory)
+
+### Danh sách nhân sự & giáo viên
+Trả về danh sách hợp nhất (Teacher + Staff), có thể tìm kiếm và lọc theo tab.
+
+- **URL**: `/api/v1/personnel`
+- **Method**: `GET`
+- **Auth required**: Yes (Bearer; theo cấu hình hiện tại)
+
+#### Query Parameters
+| Tham số | Kiểu dữ liệu | Mô tả |
+| :--- | :---: | :--- |
+| `search` | String | Không phân biệt hoa thường, khớp một phần trên tên, email, SĐT, hoặc specialty/department. Bỏ qua nếu rỗng. |
+| `segment` | String | `ALL` (mặc định) \| `ACADEMIC` (chỉ giáo viên) \| `ADMINISTRATIVE` (chỉ nhân sự hành chính). |
+
+### Thống kê personnel (dashboard)
+- **URL**: `/api/v1/personnel/stats`
+- **Method**: `GET`

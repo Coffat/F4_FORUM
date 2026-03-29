@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import Image from "next/image";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -188,22 +187,22 @@ export default function LoginPage() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  opaciy="1"
+                  opacity="1"
                   d="M23.4938 12.2749C23.4938 11.4255 23.4182 10.6015 23.2841 9.80518H12V14.4784H18.4526C18.17 16.0028 17.3093 17.2917 16.0279 18.1408V21.1685H19.897C22.1648 19.0833 23.4938 15.9616 23.4938 12.2749Z"
                   fill="#4285F4"
                 />
                 <path
-                  opaciy="1"
+                  opacity="1"
                   d="M12 24C15.2343 24 17.9461 22.9292 19.897 21.1685L16.0279 18.1408C14.9708 18.8488 13.5936 19.2801 12 19.2801C8.91746 19.2801 6.30919 17.199 5.37346 14.4172H1.3916V17.5024C3.34298 21.383 7.33744 24 12 24Z"
                   fill="#34A853"
                 />
                 <path
-                  opaciy="1"
+                  opacity="1"
                   d="M5.37346 14.4172C5.13253 13.693 4.99842 12.8584 4.99842 12C4.99842 11.1416 5.13253 10.307 5.37346 9.5828V6.49756H1.3916C0.587391 8.09458 0.124512 9.99283 0.124512 12C0.124512 14.0072 0.587391 15.9054 1.3916 17.5024L5.37346 14.4172Z"
                   fill="#FBBC04"
                 />
                 <path
-                  opaciy="1"
+                  opacity="1"
                   d="M12 4.71991C13.7631 4.71991 15.338 5.32653 16.5821 6.51468L20.0039 3.09292C17.9324 1.16644 15.2205 0 12 0C7.33744 0 3.34298 2.61699 1.3916 6.49756L5.37346 9.5828C6.30919 6.80105 8.91746 4.71991 12 4.71991Z"
                   fill="#EA4335"
                 />

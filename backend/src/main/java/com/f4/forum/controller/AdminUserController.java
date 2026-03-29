@@ -37,9 +37,16 @@ public class AdminUserController {
     public ResponseEntity<Page<UserDirectoryResponse>> getUserDirectory(
             @Parameter(description = "Partial match on full name or email (case-insensitive). Blank/whitespace is treated as no filter; typical client sends debounced keystrokes.")
             @RequestParam(required = false) String search,
+            @Parameter(description = "Exact match: STUDENT | TEACHER | STAFF")
+            @RequestParam(required = false) String userType,
+            @Parameter(description = "Exact match: ACTIVE | INACTIVE | SUSPENDED")
+            @RequestParam(required = false) String status,
+            @Parameter(description = "Exact match on account role: ROLE_STUDENT | ROLE_TEACHER | ROLE_STAFF | ROLE_ADMIN")
+            @RequestParam(required = false) String role,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        Page<UserDirectoryResponse> users = userManagementFacade.fetchUserDirectory(search, pageable);
+        Page<UserDirectoryResponse> users = userManagementFacade.fetchUserDirectory(
+                search, userType, status, role, pageable);
         return ResponseEntity.ok(users);
     }
 

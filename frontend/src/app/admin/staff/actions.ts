@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { buildPersonnelApiQuery } from './staff-directory-url';
 
 const BE_URL = 'http://localhost:8080/api/v1/personnel';
 
@@ -14,9 +15,11 @@ async function getAuthHeader() {
   };
 }
 
-export async function getPersonnelList() {
+export async function getPersonnelList(search = '', segment: string = 'ALL') {
   try {
-    const res = await fetch(BE_URL, {
+    const qs = buildPersonnelApiQuery({ search, segment });
+    const url = qs ? `${BE_URL}?${qs}` : BE_URL;
+    const res = await fetch(url, {
       method: 'GET',
       headers: await getAuthHeader(),
       cache: 'no-store'

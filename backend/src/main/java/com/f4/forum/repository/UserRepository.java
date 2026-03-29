@@ -2,6 +2,7 @@ package com.f4.forum.repository;
 
 import com.f4.forum.dto.response.UserDirectoryResponse;
 import com.f4.forum.entity.User;
+import com.f4.forum.entity.enums.AccountRole;
 import com.f4.forum.entity.enums.UserStatus;
 import com.f4.forum.entity.enums.UserType;
 import org.springframework.data.domain.Page;
@@ -21,10 +22,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
            CAST(u.userType as string), CAST(ua.role as string), CAST(u.status as string), ua.lastLogin)
        FROM User u
        LEFT JOIN UserAccount ua ON u.id = ua.user.id
-       WHERE (:searchTerm IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-              OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
+       WHERE (:searchTerm IS NULL OR (LOWER(u.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+              OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%'))))
+       AND (:userType IS NULL OR u.userType = :userType)
+       AND (:status IS NULL OR u.status = :status)
+       AND (:role IS NULL OR ua.role = :role)
     """)
-    Page<UserDirectoryResponse> findUserDirectory(@Param("searchTerm") String searchTerm, Pageable pageable);
+    Page<UserDirectoryResponse> findUserDirectory(
+            @Param("searchTerm") String searchTerm,
+            @Param("userType") UserType userType,
+            @Param("status") UserStatus status,
+            @Param("role") AccountRole role,
+            Pageable pageable);
 
     long countByUserTypeAndStatus(UserType type, UserStatus status);
     
