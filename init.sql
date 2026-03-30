@@ -444,3 +444,58 @@ INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
 (7, 'teacher', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_TEACHER');
 
 
+-- ==========================================
+-- 5. TEACHER DEMO DATA (Teacher Portal)
+-- Seed dữ liệu mẫu cho teacher user_id = 7 để hiển thị được:
+-- - Lớp đang dạy
+-- - Buổi dạy trong tuần (schedules)
+-- - Bài tập chờ chấm (submissions)
+-- ==========================================
+
+-- ── Students Demo (để có enrollment/submission) ───────────────────────
+INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
+(21, 'Học viên Demo A', '0901000001', 'student.a@f4forum.com', 'ACTIVE', 'STUDENT'),
+(22, 'Học viên Demo B', '0901000002', 'student.b@f4forum.com', 'ACTIVE', 'STUDENT');
+
+INSERT INTO students (user_id, date_of_birth, gender, address, registration_date) VALUES
+(21, '2006-05-10', 'Nam', 'Q1, HCM', '2026-03-01'),
+(22, '2007-02-20', 'Nữ', 'Q3, HCM', '2026-03-05');
+
+-- Tài khoản demo cho học viên (mật khẩu: "1")
+INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
+(21, 'student_a', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT'),
+(22, 'student_b', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT');
+
+-- ── Class demo do teacher (id=7) phụ trách ────────────────────────────
+INSERT INTO classes (id, course_id, default_room_id, class_code, start_date, end_date, max_students, status) VALUES
+(9, 1, 1, 'TEA-2026-01', '2026-03-25', '2026-06-30', 15, 'OPEN');
+
+INSERT INTO class_teachers (class_id, teacher_id) VALUES
+(9, 7); -- Teacher Demo (user_id=7)
+
+-- ── Schedule tuần hiện tại (để "buổi dạy tuần này" có data) ───────────
+INSERT INTO schedules (id, class_id, room_id, date, start_time, end_time, is_online, meeting_link) VALUES
+(1, 9, 1, '2026-03-30', '18:00:00', '20:00:00', FALSE, NULL),
+(2, 9, 1, '2026-04-01', '18:00:00', '20:00:00', FALSE, NULL),
+(3, 9, 1, '2026-04-03', '18:00:00', '20:00:00', FALSE, NULL);
+
+-- ── Enrollments (gắn học viên vào lớp) ────────────────────────────────
+INSERT INTO enrollments (id, student_id, class_id, enrollment_date, status) VALUES
+(1, 21, 9, '2026-03-26', 'ENROLLED'),
+(2, 22, 9, '2026-03-26', 'ENROLLED');
+
+-- ── Attendance mẫu cho buổi đầu tiên ──────────────────────────────────
+INSERT INTO attendances (id, schedule_id, enrollment_id, is_present, remarks) VALUES
+(1, 1, 1, TRUE,  'Đúng giờ'),
+(2, 1, 2, FALSE, 'Vắng (demo)');
+
+-- ── Assignments + Submissions (để có "bài tập chờ chấm") ──────────────
+INSERT INTO assignments (id, class_id, teacher_id, title, description, attachment_url, due_date, max_score) VALUES
+(1, 9, 7, 'Homework 01 - Vocabulary', 'Làm bài tập từ vựng Unit 1 (demo).', NULL, '2026-04-02 23:59:00', 10.0),
+(2, 9, 7, 'Homework 02 - Writing Task', 'Viết đoạn văn 150 từ (demo).', NULL, '2026-04-05 23:59:00', 20.0);
+
+INSERT INTO submissions (id, assignment_id, student_id, teacher_id, submission_date, file_url, score, teacher_comment, status) VALUES
+(1, 1, 21, 7, '2026-03-30 20:30:00', 'https://example.com/submission/student_a_hw01.pdf', NULL, NULL, 'SUBMITTED'),
+(2, 1, 22, 7, '2026-03-30 20:40:00', 'https://example.com/submission/student_b_hw01.pdf', NULL, NULL, 'SUBMITTED'),
+(3, 2, 21, 7, '2026-04-01 20:30:00', 'https://example.com/submission/student_a_hw02.pdf', NULL, NULL, 'SUBMITTED');
+

@@ -103,6 +103,59 @@ Tài khoản không tồn tại!
 
 ---
 
+## 👨‍🏫 6. Teacher Portal Module
+
+Module phục vụ giao diện dành cho **ROLE_TEACHER** (Profile, lớp học, lịch dạy, ...).
+
+### Lấy hồ sơ giảng viên hiện tại (Me)
+
+- **URL**: `/api/v1/teachers/me`
+- **Method**: `GET`
+- **Auth required**: Yes (mock) — gửi `Authorization: Bearer <token>` lấy từ `/api/v1/auth/login`
+
+#### Headers
+| Header | Bắt buộc | Mô tả |
+| :--- | :---: | :--- |
+| `Authorization` | Có | `Bearer <token>` (token mock format: `...mock_token_for_<username>`) |
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+{
+  "username": "teacher",
+  "role": "ROLE_TEACHER",
+  "fullName": "Giảng viên Demo",
+  "email": "teacher@f4forum.com",
+  "phone": "0888777666",
+  "specialty": "IELTS Specialist",
+  "hireDate": "2024-01-01",
+  "lastLogin": "2026-03-30T12:38:48.007"
+}
+```
+
+#### Response - Thất bại (HTTP 400 Bad Request)
+Trả về chuỗi text lỗi:
+
+```text
+Thiếu Authorization Bearer token!
+```
+
+### Lấy metrics tổng quan (Overview)
+
+- **URL**: `/api/v1/teachers/me/overview`
+- **Method**: `GET`
+- **Auth required**: Yes (mock) — gửi `Authorization: Bearer <token>` lấy từ `/api/v1/auth/login`
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+{
+  "activeClassesCount": 1,
+  "pendingSubmissionsCount": 3,
+  "weeklySessionsCount": 3
+}
+```
+
 ## 🛠️ 3. Admin - User Management Module
 
 Module dành riêng cho Quản trị viên điều hành nhân sự, học viên và hệ thống.
