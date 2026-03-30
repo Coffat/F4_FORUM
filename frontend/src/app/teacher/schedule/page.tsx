@@ -8,7 +8,7 @@ export default function TeacherSchedulePage() {
           Lịch dạy
         </h2>
         <p className="text-slate-500 mt-1 font-medium">
-          Xem lịch theo tuần/ngày và phòng học (khung giao diện).
+          Xem lịch theo tuần/ngày và phòng học.
         </p>
       </div>
 

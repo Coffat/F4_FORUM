@@ -28,6 +28,9 @@ public class Material {
     @Column(nullable = false)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "material_type", length = 50)
     private String materialType;
 

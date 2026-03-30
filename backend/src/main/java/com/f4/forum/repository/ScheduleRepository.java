@@ -24,5 +24,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("""
+            SELECT s
+            FROM Schedule s
+            WHERE s.classEntity.id = :classId
+            ORDER BY s.date DESC, s.startTime DESC
+            """)
+    java.util.List<Schedule> findByClassId(@Param("classId") Long classId);
 }
 

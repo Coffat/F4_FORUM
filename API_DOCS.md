@@ -216,6 +216,81 @@ Trả về object `TeacherAssignmentResponse` vừa tạo.
 ]
 ```
 
+### Attendance - Lấy danh sách buổi học của lớp
+
+- **URL**: `/api/v1/teachers/classes/{classId}/attendance/sessions`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Attendance - Lấy bảng điểm danh theo buổi
+
+- **URL**: `/api/v1/teachers/classes/{classId}/attendance?scheduleId={scheduleId}`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Attendance - Lưu điểm danh theo buổi
+
+- **URL**: `/api/v1/teachers/classes/{classId}/attendance?scheduleId={scheduleId}`
+- **Method**: `PUT`
+- **Auth required**: Yes (mock Bearer token)
+- **Body**:
+
+```json
+{
+  "entries": [
+    { "enrollmentId": 1, "isPresent": true, "remarks": "Đúng giờ" },
+    { "enrollmentId": 2, "isPresent": false, "remarks": "Vắng có phép" }
+  ]
+}
+```
+
+### Grades - Lấy bảng nhập điểm theo lớp
+
+- **URL**: `/api/v1/teachers/classes/{classId}/grades`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Grades - Lưu điểm theo lớp
+
+- **URL**: `/api/v1/teachers/classes/{classId}/grades`
+- **Method**: `PUT`
+- **Auth required**: Yes (mock Bearer token)
+- **Body**:
+
+```json
+{
+  "entries": [
+    {
+      "enrollmentId": 1,
+      "midtermScore": 80,
+      "finalScore": 85,
+      "grade": "B+",
+      "teacherComment": "Tiến bộ tốt"
+    }
+  ]
+}
+```
+
+### Materials - Lấy danh sách tài liệu của lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/materials`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Materials - Upload tài liệu cho lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/materials`
+- **Method**: `POST`
+- **Auth required**: Yes (mock Bearer token)
+- **Content-Type**: `multipart/form-data`
+
+#### Form fields
+| Trường | Kiểu | Bắt buộc | Mô tả |
+| :--- | :---: | :---: | :--- |
+| `title` | String | Có | Tiêu đề tài liệu |
+| `description` | String | Không | Mô tả (optional) |
+| `file` | File | Có | File tài liệu |
+
 ## 🛠️ 3. Admin - User Management Module
 
 Module dành riêng cho Quản trị viên điều hành nhân sự, học viên và hệ thống.

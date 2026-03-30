@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { label: "Danh sách các lớp", href: "/teacher/classes" },
-  { label: "Giao bài tập", href: "/teacher/classes/assignments" },
   { label: "Điểm danh", href: "/teacher/classes/attendance" },
   { label: "Nhập điểm", href: "/teacher/classes/grades" },
   { label: "Up tài liệu", href: "/teacher/classes/materials" },
@@ -25,8 +24,7 @@ export default function TeacherClassesLayout({
           Lớp học
         </h2>
         <p className="text-slate-500 mt-1 font-medium">
-          Quản lý lớp: giao bài tập, điểm danh, nhập điểm, tài liệu (khung giao
-          diện).
+          Quản lý lớp: điểm danh, nhập điểm, tài liệu.
         </p>
       </div>
 

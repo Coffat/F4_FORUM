@@ -225,6 +225,7 @@ CREATE TABLE materials (
     course_id BIGINT,
     class_id BIGINT,
     title VARCHAR(255) NOT NULL,
+    description TEXT,
     material_type VARCHAR(50),
     file_url TEXT NOT NULL,
     upload_date DATE,

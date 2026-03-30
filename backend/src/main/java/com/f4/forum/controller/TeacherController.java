@@ -3,11 +3,17 @@ package com.f4.forum.controller;
 import com.f4.forum.dto.response.TeacherProfileResponse;
 import com.f4.forum.dto.response.TeacherOverviewResponse;
 import com.f4.forum.dto.request.CreateTeacherAssignmentCommand;
+import com.f4.forum.dto.request.UpdateTeacherAttendanceCommand;
+import com.f4.forum.dto.request.UpdateTeacherGradesCommand;
+import com.f4.forum.dto.request.CreateTeacherMaterialCommand;
 import com.f4.forum.service.TeacherProfileFacade;
 import com.f4.forum.service.TeacherOverviewFacade;
 import com.f4.forum.service.TeacherClassesFacade;
 import com.f4.forum.service.TeacherAssignmentFacade;
 import com.f4.forum.service.TeacherStudentFacade;
+import com.f4.forum.service.TeacherAttendanceFacade;
+import com.f4.forum.service.TeacherGradesFacade;
+import com.f4.forum.service.TeacherMaterialFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +47,9 @@ public class TeacherController {
     private final TeacherClassesFacade teacherClassesFacade;
     private final TeacherAssignmentFacade teacherAssignmentFacade;
     private final TeacherStudentFacade teacherStudentFacade;
+    private final TeacherAttendanceFacade teacherAttendanceFacade;
+    private final TeacherGradesFacade teacherGradesFacade;
+    private final TeacherMaterialFacade teacherMaterialFacade;
 
     @GetMapping("/me")
     @Operation(
@@ -203,6 +214,137 @@ public class TeacherController {
                     parsedMaxScore
             );
             return ResponseEntity.ok(teacherAssignmentFacade.createAssignment(classId, token, command, originalFileName));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/classes/{classId}/attendance/sessions")
+    @Operation(summary = "Lấy danh sách buổi học của lớp để điểm danh")
+    public ResponseEntity<?> getAttendanceSessions(
+            @PathVariable Long classId,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            return ResponseEntity.ok(teacherAttendanceFacade.getClassSessions(classId, token));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/classes/{classId}/attendance")
+    @Operation(summary = "Lấy danh sách học viên và trạng thái điểm danh theo buổi")
+    public ResponseEntity<?> getAttendanceSheet(
+            @PathVariable Long classId,
+            @RequestParam("scheduleId") Long scheduleId,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            return ResponseEntity.ok(teacherAttendanceFacade.getAttendanceSheet(classId, scheduleId, token));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/classes/{classId}/attendance")
+    @Operation(summary = "Lưu điểm danh cho 1 buổi học")
+    public ResponseEntity<?> saveAttendance(
+            @PathVariable Long classId,
+            @RequestParam("scheduleId") Long scheduleId,
+            @RequestBody UpdateTeacherAttendanceCommand command,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            return ResponseEntity.ok(teacherAttendanceFacade.saveAttendance(classId, scheduleId, token, command));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/classes/{classId}/grades")
+    @Operation(summary = "Lấy bảng nhập điểm theo lớp")
+    public ResponseEntity<?> getGradesSheet(
+            @PathVariable Long classId,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            return ResponseEntity.ok(teacherGradesFacade.getGradesSheet(classId, token));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/classes/{classId}/grades")
+    @Operation(summary = "Lưu điểm cho lớp")
+    public ResponseEntity<?> saveGrades(
+            @PathVariable Long classId,
+            @RequestBody UpdateTeacherGradesCommand command,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            return ResponseEntity.ok(teacherGradesFacade.saveGrades(classId, token, command));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/classes/{classId}/materials")
+    @Operation(summary = "Lấy danh sách tài liệu của lớp")
+    public ResponseEntity<?> getClassMaterials(
+            @PathVariable Long classId,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            return ResponseEntity.ok(teacherMaterialFacade.getMaterials(classId, token));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/classes/{classId}/materials", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload tài liệu cho lớp", description = "Nhập tiêu đề, mô tả và file tài liệu (bắt buộc).")
+    public ResponseEntity<?> createMaterial(
+            @PathVariable Long classId,
+            @RequestParam("title") String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            if (file == null || file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Vui lòng chọn file tài liệu để upload!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            String originalFileName = file.getOriginalFilename();
+            CreateTeacherMaterialCommand command = new CreateTeacherMaterialCommand(title, description);
+            return ResponseEntity.ok(teacherMaterialFacade.createMaterial(classId, token, command, originalFileName));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
