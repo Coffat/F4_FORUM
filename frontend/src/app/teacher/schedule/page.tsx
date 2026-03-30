@@ -1,6 +1,66 @@
 import { Card } from "@/components/ui/card";
+import { cookies } from "next/headers";
+import TeacherScheduleCalendarClient from "./TeacherScheduleCalendarClient";
 
-export default function TeacherSchedulePage() {
+type ScheduleEvent = {
+  scheduleId: number;
+  classId: number;
+  classCode: string;
+  courseName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  roomName: string | null;
+  online: boolean;
+  meetingLink: string | null;
+};
+
+const TEACHER_BASE = "http://localhost:8080/api/v1/teachers";
+
+async function getScheduleEvents(from: string, to: string): Promise<ScheduleEvent[]> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  if (!token) return [];
+
+  try {
+    const res = await fetch(`${TEACHER_BASE}/me/schedule?from=${from}&to=${to}`, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return (await res.json()) as ScheduleEvent[];
+  } catch {
+    return [];
+  }
+}
+
+export default async function TeacherSchedulePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ year?: string; month?: string }>;
+}) {
+  const params = await searchParams;
+  const now = new Date();
+  const year = Number(params.year ?? now.getFullYear());
+  const month = Number(params.month ?? now.getMonth() + 1);
+
+  const firstDay = new Date(year, month - 1, 1);
+  const from = new Date(firstDay);
+  const fromOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+  from.setDate(firstDay.getDate() - fromOffset);
+
+  const to = new Date(from);
+  to.setDate(from.getDate() + 41);
+
+  const toIsoDate = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${dd}`;
+  };
+
+  const events = await getScheduleEvents(toIsoDate(from), toIsoDate(to));
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
       <div>
@@ -8,49 +68,13 @@ export default function TeacherSchedulePage() {
           Lịch dạy
         </h2>
         <p className="text-slate-500 mt-1 font-medium">
-          Xem lịch theo tuần/ngày và phòng học.
+          Theo dõi lịch dạy theo dạng Calendar.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="rounded-2xl border-slate-100 p-6 lg:col-span-2">
-          <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-4">
-            LỊCH TUẦN
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {["Mon", "Wed", "Fri", "Sat"].map((day) => (
-              <div
-                key={day}
-                className="bg-slate-50 border border-slate-100 rounded-2xl p-5"
-              >
-                <p className="text-sm font-bold text-slate-900">{day}</p>
-                <p className="text-xs text-slate-500 font-medium mt-1">
-                  (Placeholder) 0 ca học
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="rounded-2xl border-slate-100 p-6">
-          <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-4">
-            BỘ LỌC
-          </p>
-          <div className="space-y-3">
-            {["Chi nhánh", "Phòng học", "Lớp", "Online/Offline"].map((item) => (
-              <div
-                key={item}
-                className="bg-white border border-slate-100 rounded-2xl p-4"
-              >
-                <p className="text-sm font-bold text-slate-800">{item}</p>
-                <p className="text-xs text-slate-500 font-medium mt-1">
-                  Placeholder.
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
+      <Card className="rounded-2xl border-slate-100 p-4">
+        <TeacherScheduleCalendarClient year={year} month={month} events={events} />
+      </Card>
     </div>
   );
 }

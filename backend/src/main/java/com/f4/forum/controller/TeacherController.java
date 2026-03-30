@@ -14,6 +14,7 @@ import com.f4.forum.service.TeacherStudentFacade;
 import com.f4.forum.service.TeacherAttendanceFacade;
 import com.f4.forum.service.TeacherGradesFacade;
 import com.f4.forum.service.TeacherMaterialFacade;
+import com.f4.forum.service.TeacherScheduleFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RestController
@@ -50,6 +52,7 @@ public class TeacherController {
     private final TeacherAttendanceFacade teacherAttendanceFacade;
     private final TeacherGradesFacade teacherGradesFacade;
     private final TeacherMaterialFacade teacherMaterialFacade;
+    private final TeacherScheduleFacade teacherScheduleFacade;
 
     @GetMapping("/me")
     @Operation(
@@ -345,6 +348,26 @@ public class TeacherController {
             String originalFileName = file.getOriginalFilename();
             CreateTeacherMaterialCommand command = new CreateTeacherMaterialCommand(title, description);
             return ResponseEntity.ok(teacherMaterialFacade.createMaterial(classId, token, command, originalFileName));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/me/schedule")
+    @Operation(summary = "Lấy lịch dạy theo khoảng ngày")
+    public ResponseEntity<?> getMySchedule(
+            @RequestParam("from") String from,
+            @RequestParam("to") String to,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            LocalDate fromDate = LocalDate.parse(from);
+            LocalDate toDate = LocalDate.parse(to);
+            return ResponseEntity.ok(teacherScheduleFacade.getMySchedule(token, fromDate, toDate));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

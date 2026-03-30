@@ -291,6 +291,31 @@ Trả về object `TeacherAssignmentResponse` vừa tạo.
 | `description` | String | Không | Mô tả (optional) |
 | `file` | File | Có | File tài liệu |
 
+### Schedule - Lấy lịch dạy theo khoảng ngày (Teacher)
+
+- **URL**: `/api/v1/teachers/me/schedule?from={yyyy-MM-dd}&to={yyyy-MM-dd}`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+[
+  {
+    "scheduleId": 1,
+    "classId": 9,
+    "classCode": "TEA-2026-01",
+    "courseName": "IELTS Foundation – Khởi Đầu",
+    "date": "2026-03-30",
+    "startTime": "18:00:00",
+    "endTime": "20:00:00",
+    "roomName": "Phòng 101 – Lớp Nhỏ",
+    "online": false,
+    "meetingLink": null
+  }
+]
+```
+
 ## 🛠️ 3. Admin - User Management Module
 
 Module dành riêng cho Quản trị viên điều hành nhân sự, học viên và hệ thống.
