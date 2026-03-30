@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { label: "Tổng quan", href: "/teacher/classes" },
+  { label: "Danh sách các lớp", href: "/teacher/classes" },
   { label: "Giao bài tập", href: "/teacher/classes/assignments" },
   { label: "Điểm danh", href: "/teacher/classes/attendance" },
   { label: "Nhập điểm", href: "/teacher/classes/grades" },
@@ -33,8 +33,10 @@ export default function TeacherClassesLayout({
       <div className="bg-white border border-slate-100 rounded-2xl p-2 shadow-sm">
         <div className="flex flex-wrap gap-2">
           {TABS.map((tab) => {
-            const isActive =
-              pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+            const isClassesListTab = tab.href === "/teacher/classes";
+            const isActive = isClassesListTab
+              ? pathname === tab.href
+              : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
             return (
               <Link
                 key={tab.href}

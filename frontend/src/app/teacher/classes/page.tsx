@@ -1,52 +1,79 @@
 import { Card } from "@/components/ui/card";
+import { cookies } from "next/headers";
+import Link from "next/link";
 
-export default function TeacherClassesOverviewPage() {
+type TeacherClassSummary = {
+  classId: number;
+  classCode: string;
+  courseName: string;
+  status: string;
+  activeStudents: number;
+  weeklySessions: number;
+};
+
+const TEACHER_CLASSES_URL = "http://localhost:8080/api/v1/teachers/me/classes";
+
+async function getTeacherClasses(): Promise<TeacherClassSummary[]> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  if (!token) return [];
+
+  try {
+    const res = await fetch(TEACHER_CLASSES_URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      console.error("[TeacherClasses] Failed:", await res.text());
+      return [];
+    }
+
+    return (await res.json()) as TeacherClassSummary[];
+  } catch (err) {
+    console.error("[TeacherClasses] Backend connection failed:", err);
+    return [];
+  }
+}
+
+export default async function TeacherClassesOverviewPage() {
+  const classes = await getTeacherClasses();
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 pb-10">
-      <Card className="rounded-2xl border-slate-100 p-6 lg:col-span-2">
+    <div className="grid grid-cols-1 gap-6 animate-in fade-in duration-500 pb-10">
+      <Card className="rounded-2xl border-slate-100 p-6">
         <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-4">
           DANH SÁCH LỚP
         </p>
         <div className="space-y-3">
-          {["FON-2026-01", "ELM-2026-01", "INT-2026-01"].map((code) => (
-            <div
-              key={code}
+          {classes.length === 0 && (
+            <p className="text-sm text-slate-500 font-medium">
+              Hiện tại bạn chưa được gán vào lớp nào.
+            </p>
+          )}
+
+          {classes.map((clazz) => (
+            <Link
+              key={clazz.classId}
+              href={`/teacher/classes/${clazz.classId}`}
               className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-2xl p-4"
             >
               <div>
-                <p className="font-bold text-slate-900">{code}</p>
+                <p className="font-bold text-slate-900">
+                  {clazz.classCode} — {clazz.courseName}
+                </p>
                 <p className="text-xs text-slate-500 font-medium">
-                  (Placeholder) 0 học viên • 0 buổi/tuần
+                  {clazz.activeStudents} học viên • {clazz.weeklySessions} buổi/tuần
                 </p>
               </div>
               <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-xl">
-                OPEN
+                {clazz.status}
               </span>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <Card className="rounded-2xl border-slate-100 p-6">
-        <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-4">
-          VIỆC CẦN LÀM
-        </p>
-        <div className="space-y-3">
-          {[
-            "Chấm bài tập (0)",
-            "Điểm danh hôm nay (0)",
-            "Nhập điểm (0)",
-            "Upload tài liệu (0)",
-          ].map((item) => (
-            <div
-              key={item}
-              className="bg-white border border-slate-100 rounded-2xl p-4"
-            >
-              <p className="text-sm font-bold text-slate-800">{item}</p>
-              <p className="text-xs text-slate-500 font-medium mt-1">
-                Placeholder cho dữ liệu backend.
-              </p>
-            </div>
+            </Link>
           ))}
         </div>
       </Card>

@@ -156,6 +156,66 @@ Thiếu Authorization Bearer token!
 }
 ```
 
+### Lấy danh sách bài tập theo lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/assignments`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Assignment 20260330-140530",
+    "description": "Làm bài tập từ vựng Unit 1",
+    "attachmentUrl": "uploaded://homework.pdf",
+    "dueDate": "2026-04-06T14:05:30"
+  }
+]
+```
+
+### Tạo bài tập mới cho lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/assignments`
+- **Method**: `POST`
+- **Auth required**: Yes (mock Bearer token)
+- **Content-Type**: `multipart/form-data`
+
+#### Form fields
+| Trường | Kiểu | Bắt buộc | Mô tả |
+| :--- | :---: | :---: | :--- |
+| `title` | String | Có | Tiêu đề bài tập |
+| `description` | String | Có | Mô tả bài tập cho học viên |
+| `dueDateTime` | String (ISO datetime) | Không | Hạn nộp, ví dụ `2026-04-06T23:59:00` |
+| `maxScore` | Number | Không | Điểm tối đa, để trống sẽ mặc định `100` |
+| `file` | File | Không | File đính kèm (nếu có) |
+
+#### Response - Thành công (HTTP 200 OK)
+Trả về object `TeacherAssignmentResponse` vừa tạo.
+
+### Lấy tất cả học viên của lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/students`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+[
+  {
+    "enrollmentId": 1,
+    "studentId": 21,
+    "fullName": "Học viên Demo A",
+    "email": "student.a@f4forum.com",
+    "phone": "0901000001",
+    "enrollmentStatus": "ENROLLED"
+  }
+]
+```
+
 ## 🛠️ 3. Admin - User Management Module
 
 Module dành riêng cho Quản trị viên điều hành nhân sự, học viên và hệ thống.
