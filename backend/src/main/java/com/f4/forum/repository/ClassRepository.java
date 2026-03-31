@@ -17,4 +17,10 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
     @Query("SELECT COUNT(DISTINCT t.id) FROM ClassEntity c JOIN c.teachers t WHERE c.status IN :statuses")
     long countDistinctTeachersInActiveClasses(@Param("statuses") java.util.List<ClassStatus> statuses);
 
+    @Query("SELECT COUNT(DISTINCT c.id) FROM ClassEntity c JOIN c.teachers t WHERE t.id = :teacherId AND c.status IN :statuses")
+    long countActiveClassesByTeacher(
+            @Param("teacherId") Long teacherId,
+            @Param("statuses") java.util.List<ClassStatus> statuses
+    );
+
 }

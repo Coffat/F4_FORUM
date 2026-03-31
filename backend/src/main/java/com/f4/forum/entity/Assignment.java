@@ -47,4 +47,25 @@ public class Assignment {
         }
         this.dueDate = newDueDate;
     }
+
+    public void updateBasics(String title, String description, LocalDateTime dueDate, BigDecimal maxScore, String attachmentUrl) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Tiêu đề bài tập không được để trống!");
+        }
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("Mô tả bài tập không được để trống!");
+        }
+        if (maxScore != null && maxScore.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Điểm tối đa phải lớn hơn 0!");
+        }
+        this.title = title.trim();
+        this.description = description.trim();
+        if (dueDate != null) {
+            this.dueDate = dueDate;
+        }
+        if (maxScore != null) {
+            this.maxScore = maxScore;
+        }
+        this.attachmentUrl = attachmentUrl;
+    }
 }
