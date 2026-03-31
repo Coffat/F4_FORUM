@@ -55,6 +55,7 @@ public class CourseQueryService {
                 .status(c.getStatus())
                 .imageUrl(c.getImageUrl())
                 .imageColor(c.getImageColor())
+                .level(c.getLevel())
                 .build();
     }
 }

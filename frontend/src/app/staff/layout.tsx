@@ -16,15 +16,15 @@ import {
   ClipboardList,
   Activity,
   Plus,
+  GraduationCap,
 } from "lucide-react";
 import Image from "next/image";
 
 const STAFF_NAV = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/staff/dashboard" },
-  { name: "Curriculum", icon: BookOpen, href: "/staff/curriculum" },
-  { name: "Resources", icon: Calendar, href: "/staff/resources" }, // Changed to Calendar for Resources as per similar vibe
-  { name: "Analytics", icon: Activity, href: "/staff/analytics" },
-  { name: "Community", icon: Users, href: "/staff/community" },
+  { name: "Courses", icon: BookOpen, href: "/staff/courses" },
+  { name: "Classes", icon: GraduationCap, href: "/staff/classes" },
+  { name: "Schedules", icon: Calendar, href: "/staff/schedules" },
 ];
 
 export default function StaffPortalLayout({
@@ -76,13 +76,6 @@ export default function StaffPortalLayout({
               );
             })}
           </nav>
-        </div>
-
-        <div className="px-6 mb-4">
-           <button className="w-full flex items-center justify-center gap-2 bg-[#0B3A9A] text-white py-3 rounded-xl font-bold text-sm hover:bg-blue-800 transition-all shadow-md shadow-blue-200">
-             <Plus className="w-4 h-4" />
-             New Lesson
-           </button>
         </div>
 
         {/* Bottom Section */}

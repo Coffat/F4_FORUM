@@ -84,6 +84,18 @@ public class Course {
         this.status = CourseStatus.PUBLISHED;
     }
 
+    public void updateDetailsByStaff(String name, String description, String category, String level, 
+                                     Integer maxEnrollment, String imageUrl, String imageColor, CourseStatus status) {
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.level = level;
+        this.maxEnrollment = maxEnrollment;
+        this.imageUrl = imageUrl;
+        this.imageColor = imageColor;
+        this.status = status;
+    }
+
     public void archive() {
         this.status = CourseStatus.ARCHIVED;
     }

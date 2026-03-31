@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Users,
   Activity,
@@ -9,6 +10,7 @@ import {
   Clock,
   ChevronRight,
   Zap,
+  Calendar,
   ShieldCheck,
   Cpu,
   Wifi,
@@ -242,9 +244,10 @@ export default function StaffDashboardClient({
            <div className="bg-[#F8F9FB] rounded-[2.5rem] p-8 border border-slate-100">
               <h3 className="font-black text-slate-900 text-lg mb-6 tracking-tight">Quick Actions</h3>
               <div className="space-y-3">
-                 <ActionBtn icon={Activity} label="Issue Announcement" color="bg-blue-100 text-blue-600" />
-                 <ActionBtn icon={FileText} label="Inventory Audit" color="bg-indigo-100 text-indigo-600" />
-                 <ActionBtn icon={Download} label="Financial Export" color="bg-orange-100 text-orange-600" />
+                 <ActionBtn icon={Activity} label="Issue Announcement" color="bg-blue-100 text-blue-600" href="/staff/announcements" />
+                 <ActionBtn icon={Calendar} label="Manage Schedules" color="bg-emerald-100 text-emerald-600" href="/staff/schedules" />
+                 <ActionBtn icon={FileText} label="Inventory Audit" color="bg-indigo-100 text-indigo-600" href="/staff/curriculum" />
+                 <ActionBtn icon={Download} label="Financial Export" color="bg-orange-100 text-orange-600" href="/staff/analytics" />
               </div>
            </div>
 
@@ -320,9 +323,12 @@ function InventoryRow({ icon: Icon, name, level, status, sColor, action }: any) 
   );
 }
 
-function ActionBtn({ icon: Icon, label, color }: any) {
+function ActionBtn({ icon: Icon, label, color, href }: any) {
   return (
-    <button className="w-full bg-white flex items-center justify-between p-4 rounded-2xl hover:shadow-lg transition-all border border-slate-100 group active:scale-[0.98]">
+    <Link 
+      href={href || "#"} 
+      className="w-full bg-white flex items-center justify-between p-4 rounded-2xl hover:shadow-lg transition-all border border-slate-100 group active:scale-[0.98]"
+    >
        <div className="flex items-center gap-4">
           <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${color}`}>
              <Icon className="w-4 h-4" />
@@ -330,7 +336,7 @@ function ActionBtn({ icon: Icon, label, color }: any) {
           <span className="text-sm font-black text-slate-800 tracking-tight">{label}</span>
        </div>
        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
-    </button>
+    </Link>
   );
 }
 

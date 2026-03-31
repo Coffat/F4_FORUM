@@ -51,4 +51,10 @@ public class Material {
         }
         this.uploadDate = LocalDate.now();
     }
+
+    public void updateDetails(String title, String materialType, String fileUrl) {
+        this.title = title;
+        this.materialType = materialType;
+        this.fileUrl = fileUrl;
+    }
 }

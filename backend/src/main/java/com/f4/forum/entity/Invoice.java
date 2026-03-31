@@ -3,6 +3,7 @@ package com.f4.forum.entity;
 import com.f4.forum.entity.enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -27,9 +28,11 @@ public class Invoice {
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @Builder.Default
     @Column(name = "base_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal baseAmount = BigDecimal.ZERO;
-
+    
+    @Builder.Default
     @Column(name = "final_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal finalAmount = BigDecimal.ZERO;
 
@@ -40,9 +43,11 @@ public class Invoice {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    @Builder.Default
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceDetail> details = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
         name = "invoice_promotions",

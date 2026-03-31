@@ -55,4 +55,21 @@ public class CourseCommandService {
         course.archive();
         courseRepository.save(course);
     }
+
+    public void updateCourseByStaff(Long id, com.f4.forum.dto.request.UpdateStaffCourseCommand command) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+        
+        course.updateDetailsByStaff(
+                command.getName(),
+                command.getDescription(),
+                command.getCategory(),
+                command.getLevel(),
+                command.getMaxEnrollment() != null ? command.getMaxEnrollment() : 100,
+                command.getImageUrl(),
+                command.getImageColor(),
+                command.getStatus()
+        );
+        courseRepository.save(course);
+    }
 }
