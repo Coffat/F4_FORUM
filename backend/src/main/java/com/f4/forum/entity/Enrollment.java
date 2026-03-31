@@ -41,6 +41,11 @@ public class Enrollment {
     @Version
     private Long version;
 
+    // Public setter for State Pattern
+    public void setStatus(EnrollmentStatus status) {
+        this.status = status;
+    }
+
     // Rich Domain Model: Xử lý thay đổi status hợp lệ
     public void dropCourse() {
         if (this.status == EnrollmentStatus.COMPLETED) {

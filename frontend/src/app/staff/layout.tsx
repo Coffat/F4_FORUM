@@ -17,6 +17,7 @@ import {
   Activity,
   Plus,
   GraduationCap,
+  Tag,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -25,6 +26,8 @@ const STAFF_NAV = [
   { name: "Courses", icon: BookOpen, href: "/staff/courses" },
   { name: "Classes", icon: GraduationCap, href: "/staff/classes" },
   { name: "Schedules", icon: Calendar, href: "/staff/schedules" },
+  { name: "Invoices", icon: ClipboardList, href: "/staff/invoices" },
+  { name: "Vouchers", icon: Tag, href: "/staff/promotions" },
 ];
 
 export default function StaffPortalLayout({

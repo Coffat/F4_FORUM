@@ -7,8 +7,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,26 +63,43 @@ public class Invoice {
     @Version
     private Long version;
 
-    // Rich Domain Model
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // Rich Domain Model - Sử dụng Tell, Don't Ask pattern
     public void addDetail(InvoiceDetail detail) {
         details.add(detail);
         detail.assignToInvoice(this);
-        recalculateTotals();
+        // Tính toán finalPrice trước khi recalculateTotals
+        detail.calculateFinalPrice();
     }
 
     public void applyPromotion(Promotion promotion) {
         if (promotion.isValid()) {
             this.promotions.add(promotion);
-            recalculateTotals();
         } else {
             throw new IllegalArgumentException("Promotion is expired or invalid");
         }
+    }
+
+    // Gọi sau khi tất cả details và promotions đã được thêm vào
+    public void recalculateAll() {
+        recalculateTotals();
     }
     
     public void markAsPaid() {
         this.status = InvoiceStatus.PAID;
     }
 
+    public void setStatus(InvoiceStatus status) {
+        this.status = status;
+    }
+    
     private void recalculateTotals() {
         this.baseAmount = details.stream()
                 .map(InvoiceDetail::getFinalPrice)

@@ -3,10 +3,13 @@ spring:
     name: F4 Forum Backend
 
   datasource:
-    url: jdbc:mysql://localhost:3306/f4_forum?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3307/f4_forum?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
 
   # Sử dụng Virtual Threads (Java 21) cho hiệu năng cực cao - Skill #1
   threads:

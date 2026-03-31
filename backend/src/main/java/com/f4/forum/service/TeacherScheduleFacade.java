@@ -36,10 +36,6 @@ public class TeacherScheduleFacade {
     }
 
     private TeacherScheduleEventResponse toResponse(Schedule s) {
-        String branchName = null;
-        if (s.getRoom() != null && s.getRoom().getBranch() != null) {
-            branchName = s.getRoom().getBranch().getName();
-        }
         return new TeacherScheduleEventResponse(
                 s.getId(),
                 s.getClassEntity().getId(),
@@ -49,7 +45,6 @@ public class TeacherScheduleFacade {
                 s.getStartTime(),
                 s.getEndTime(),
                 s.getRoom() != null ? s.getRoom().getName() : null,
-                branchName,
                 Boolean.TRUE.equals(s.getIsOnline()),
                 s.getMeetingLink()
         );

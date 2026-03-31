@@ -13,7 +13,6 @@ type ScheduleEvent = {
   startTime: string; // HH:mm:ss
   endTime: string; // HH:mm:ss
   roomName: string | null;
-  branchName: string | null;
   online: boolean;
   meetingLink: string | null;
 };
@@ -292,12 +291,6 @@ export default function TeacherScheduleWeekClient({
                                 {e.date} · {e.startTime.slice(0, 5)} - {e.endTime.slice(0, 5)}
                               </p>
                               <div className="mt-2 space-y-1">
-                                <div className="flex items-center justify-between gap-2">
-                                  <span className="text-[10px] font-bold text-slate-400">Branch</span>
-                                  <span className="text-[10px] font-medium text-slate-700 truncate">
-                                    {e.branchName ?? "—"}
-                                  </span>
-                                </div>
                                 <div className="flex items-center justify-between gap-2">
                                   <span className="text-[10px] font-bold text-slate-400">Room</span>
                                   <span className="text-[10px] font-medium text-slate-700 truncate">

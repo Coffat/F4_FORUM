@@ -11,7 +11,6 @@ type ScheduleEvent = {
   startTime: string;
   endTime: string;
   roomName: string | null;
-  branchName: string | null;
   online: boolean;
   meetingLink: string | null;
 };
