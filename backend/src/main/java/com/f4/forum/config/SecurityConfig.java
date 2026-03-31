@@ -55,6 +55,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").permitAll()             // Admin functionalities (Until JWT Filter is set up)
                 .requestMatchers("/api/v1/personnel/**").permitAll()      // Personnel module
                 .requestMatchers("/api/v1/staff-dashboard/**").permitAll() // Staff Dashboard metrics
+                .requestMatchers("/api/v1/staff/courses/**").permitAll()  // Staff Courses
+                .requestMatchers("/api/v1/staff/classes/**").permitAll()  // Staff Classes
+                .requestMatchers("/api/v1/staff/schedules/**").permitAll() // Staff Schedules
+                .requestMatchers("/api/v1/staff/rooms/**").permitAll()     // Staff Rooms
                 .anyRequest().authenticated()
             );
 

@@ -30,5 +30,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
             @Param("materialId") Long materialId,
             @Param("classId") Long classId
     );
-}
 
+    List<Material> findByCourseId(Long courseId);
+}

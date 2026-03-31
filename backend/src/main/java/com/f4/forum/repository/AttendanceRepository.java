@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-
     @Query("""
             SELECT a
             FROM Attendance a
@@ -30,5 +29,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("scheduleId") Long scheduleId,
             @Param("enrollmentIds") List<Long> enrollmentIds
     );
-}
 
+    @Query("SELECT a FROM Attendance a WHERE a.enrollment.classEntity.id = :classId")
+    List<Attendance> findAllByClassId(@Param("classId") Long classId);
+}

@@ -1,6 +1,7 @@
 package com.f4.forum.repository;
 
 import com.f4.forum.entity.Enrollment;
+<<<<<<< HEAD
 import com.f4.forum.entity.enums.EnrollmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -45,5 +46,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
             @Param("classId") Long classId,
             @Param("status") EnrollmentStatus status
     );
-}
 
+    boolean existsByStudentIdAndClassEntityId(Long studentId, Long classEntityId);
+    long countByClassEntityId(Long classEntityId);
+    List<Enrollment> findByClassEntityId(Long classEntityId);
+}

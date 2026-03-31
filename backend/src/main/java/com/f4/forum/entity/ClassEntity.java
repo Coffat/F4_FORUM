@@ -3,6 +3,7 @@ package com.f4.forum.entity;
 import com.f4.forum.entity.enums.ClassStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -44,6 +45,7 @@ public class ClassEntity {
     @Column(length = 50)
     private ClassStatus status;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
         name = "class_teachers",

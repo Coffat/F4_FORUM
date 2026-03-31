@@ -1,0 +1,12 @@
+package com.f4.forum.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AddStudentToClassCommand {
+    private Long studentId;
+}
