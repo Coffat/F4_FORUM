@@ -1,6 +1,7 @@
 package com.f4.forum.service;
 
 import com.f4.forum.dto.request.CreateTeacherMaterialCommand;
+import com.f4.forum.dto.request.UpdateTeacherMaterialCommand;
 import com.f4.forum.dto.response.TeacherMaterialResponse;
 import com.f4.forum.entity.ClassEntity;
 import com.f4.forum.entity.Material;
@@ -84,6 +85,49 @@ public class TeacherMaterialFacade {
                 saved.getFileUrl(),
                 saved.getUploadDate()
         );
+    }
+
+    @Transactional
+    public TeacherMaterialResponse updateMaterial(
+            Long classId,
+            Long materialId,
+            String token,
+            UpdateTeacherMaterialCommand command,
+            String originalFileName
+    ) {
+        if (command.title() == null || command.title().isBlank()) {
+            throw new RuntimeException("Tiêu đề tài liệu không được để trống!");
+        }
+
+        Long teacherId = resolveTeacherIdFromToken(token);
+        validateTeacherOwnsClass(teacherId, classId);
+
+        Material material = materialRepository.findByIdAndClassId(materialId, classId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài liệu hoặc bạn không có quyền thao tác!"));
+
+        String fileUrl = (originalFileName == null || originalFileName.isBlank())
+                ? null
+                : "uploaded://" + originalFileName;
+
+        material.updateBasics(command.title(), command.description(), fileUrl);
+
+        return new TeacherMaterialResponse(
+                material.getId(),
+                material.getTitle(),
+                material.getDescription(),
+                material.getFileUrl(),
+                material.getUploadDate()
+        );
+    }
+
+    @Transactional
+    public void deleteMaterial(Long classId, Long materialId, String token) {
+        Long teacherId = resolveTeacherIdFromToken(token);
+        validateTeacherOwnsClass(teacherId, classId);
+
+        Material material = materialRepository.findByIdAndClassId(materialId, classId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài liệu hoặc bạn không có quyền thao tác!"));
+        materialRepository.delete(material);
     }
 
     private Long resolveTeacherIdFromToken(String token) {

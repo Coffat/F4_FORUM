@@ -149,7 +149,7 @@ export default function GradesSheetClient({
           type="button"
           onClick={onSave}
           disabled={isPending}
-          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-70"
+          className="rounded-xl bg-[#0B3A9A] px-4 py-2 text-sm font-bold text-white hover:bg-blue-800 disabled:opacity-70"
         >
           {isPending ? "Đang lưu..." : "Lưu điểm"}
         </button>

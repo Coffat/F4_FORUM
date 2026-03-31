@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import TeacherClassStudentsTableClient from "./TeacherClassStudentsTableClient";
 
 type TeacherClassStudent = {
   enrollmentId: number;
@@ -53,35 +54,20 @@ export default async function TeacherClassStudentsPage({
         </div>
         <Link
           href={`/teacher/classes/${classId}`}
-          className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-2 rounded-xl hover:bg-emerald-100 transition"
+          className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-3 py-2 rounded-xl hover:bg-blue-100 transition"
         >
           Quay lại lớp
         </Link>
       </div>
 
-      <Card className="rounded-2xl border-slate-100 p-6">
+      <Card className="rounded-2xl border-slate-100 p-0 overflow-hidden">
         {students.length === 0 ? (
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-slate-500 font-medium p-6">
             Chưa có học viên nào trong lớp này.
           </p>
         ) : (
-          <div className="space-y-3">
-            {students.map((student) => (
-              <div
-                key={student.enrollmentId}
-                className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 bg-slate-50 border border-slate-100 rounded-2xl p-4"
-              >
-                <div>
-                  <p className="text-sm font-bold text-slate-900">{student.fullName}</p>
-                  <p className="text-xs text-slate-500">
-                    {student.email ?? "Không có email"} • {student.phone ?? "Không có SĐT"}
-                  </p>
-                </div>
-                <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl w-fit">
-                  {student.enrollmentStatus}
-                </span>
-              </div>
-            ))}
+          <div className="p-6">
+            <TeacherClassStudentsTableClient students={students} />
           </div>
         )}
       </Card>

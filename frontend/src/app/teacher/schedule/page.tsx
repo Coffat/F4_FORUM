@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { cookies } from "next/headers";
-import TeacherScheduleCalendarClient from "./TeacherScheduleCalendarClient";
+import TeacherScheduleWeekClient from "./TeacherScheduleWeekClientHover";
 
 type ScheduleEvent = {
   scheduleId: number;
@@ -11,6 +11,7 @@ type ScheduleEvent = {
   startTime: string;
   endTime: string;
   roomName: string | null;
+  branchName: string | null;
   online: boolean;
   meetingLink: string | null;
 };
@@ -37,20 +38,20 @@ async function getScheduleEvents(from: string, to: string): Promise<ScheduleEven
 export default async function TeacherSchedulePage({
   searchParams,
 }: {
-  searchParams: Promise<{ year?: string; month?: string }>;
+  searchParams: Promise<{ week?: string }>;
 }) {
   const params = await searchParams;
   const now = new Date();
-  const year = Number(params.year ?? now.getFullYear());
-  const month = Number(params.month ?? now.getMonth() + 1);
+  const weekParam = typeof params.week === "string" ? params.week : null;
+  const base = weekParam ? new Date(`${weekParam}T00:00:00`) : now;
+  const day = base.getDay(); // 0 Sun
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const weekStart = new Date(base);
+  weekStart.setDate(base.getDate() + mondayOffset);
+  weekStart.setHours(0, 0, 0, 0);
 
-  const firstDay = new Date(year, month - 1, 1);
-  const from = new Date(firstDay);
-  const fromOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-  from.setDate(firstDay.getDate() - fromOffset);
-
-  const to = new Date(from);
-  to.setDate(from.getDate() + 41);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
 
   const toIsoDate = (d: Date) => {
     const y = d.getFullYear();
@@ -59,7 +60,8 @@ export default async function TeacherSchedulePage({
     return `${y}-${m}-${dd}`;
   };
 
-  const events = await getScheduleEvents(toIsoDate(from), toIsoDate(to));
+  const weekStartIso = toIsoDate(weekStart);
+  const events = await getScheduleEvents(weekStartIso, toIsoDate(weekEnd));
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -73,7 +75,7 @@ export default async function TeacherSchedulePage({
       </div>
 
       <Card className="rounded-2xl border-slate-100 p-4">
-        <TeacherScheduleCalendarClient year={year} month={month} events={events} />
+        <TeacherScheduleWeekClient weekStartIso={weekStartIso} events={events} />
       </Card>
     </div>
   );

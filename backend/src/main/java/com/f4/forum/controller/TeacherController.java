@@ -3,9 +3,11 @@ package com.f4.forum.controller;
 import com.f4.forum.dto.response.TeacherProfileResponse;
 import com.f4.forum.dto.response.TeacherOverviewResponse;
 import com.f4.forum.dto.request.CreateTeacherAssignmentCommand;
+import com.f4.forum.dto.request.UpdateTeacherAssignmentCommand;
 import com.f4.forum.dto.request.UpdateTeacherAttendanceCommand;
 import com.f4.forum.dto.request.UpdateTeacherGradesCommand;
 import com.f4.forum.dto.request.CreateTeacherMaterialCommand;
+import com.f4.forum.dto.request.UpdateTeacherMaterialCommand;
 import com.f4.forum.service.TeacherProfileFacade;
 import com.f4.forum.service.TeacherOverviewFacade;
 import com.f4.forum.service.TeacherClassesFacade;
@@ -26,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -222,6 +225,62 @@ public class TeacherController {
         }
     }
 
+    @PutMapping(value = "/classes/{classId}/assignments/{assignmentId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Cập nhật bài tập của lớp", description = "Sửa tiêu đề/mô tả/hạn nộp/điểm tối đa và thay file đính kèm (optional).")
+    public ResponseEntity<?> updateAssignment(
+            @PathVariable Long classId,
+            @PathVariable Long assignmentId,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam(value = "dueDateTime", required = false) String dueDateTime,
+            @RequestParam(value = "maxScore", required = false) String maxScore,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            String originalFileName = (file == null || file.isEmpty()) ? null : file.getOriginalFilename();
+            LocalDateTime parsedDueDateTime = (dueDateTime == null || dueDateTime.isBlank())
+                    ? null
+                    : LocalDateTime.parse(dueDateTime);
+            BigDecimal parsedMaxScore = (maxScore == null || maxScore.isBlank())
+                    ? null
+                    : new BigDecimal(maxScore);
+
+            UpdateTeacherAssignmentCommand command = new UpdateTeacherAssignmentCommand(
+                    title,
+                    description,
+                    parsedDueDateTime,
+                    parsedMaxScore
+            );
+            return ResponseEntity.ok(teacherAssignmentFacade.updateAssignment(classId, assignmentId, token, command, originalFileName));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/classes/{classId}/assignments/{assignmentId}")
+    @Operation(summary = "Xóa bài tập của lớp")
+    public ResponseEntity<?> deleteAssignment(
+            @PathVariable Long classId,
+            @PathVariable Long assignmentId,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            teacherAssignmentFacade.deleteAssignment(classId, assignmentId, token);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/classes/{classId}/attendance/sessions")
     @Operation(summary = "Lấy danh sách buổi học của lớp để điểm danh")
     public ResponseEntity<?> getAttendanceSessions(
@@ -348,6 +407,48 @@ public class TeacherController {
             String originalFileName = file.getOriginalFilename();
             CreateTeacherMaterialCommand command = new CreateTeacherMaterialCommand(title, description);
             return ResponseEntity.ok(teacherMaterialFacade.createMaterial(classId, token, command, originalFileName));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping(value = "/classes/{classId}/materials/{materialId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Cập nhật tài liệu của lớp", description = "Sửa tiêu đề/mô tả và thay file (optional).")
+    public ResponseEntity<?> updateMaterial(
+            @PathVariable Long classId,
+            @PathVariable Long materialId,
+            @RequestParam("title") String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            String originalFileName = (file == null || file.isEmpty()) ? null : file.getOriginalFilename();
+            UpdateTeacherMaterialCommand command = new UpdateTeacherMaterialCommand(title, description);
+            return ResponseEntity.ok(teacherMaterialFacade.updateMaterial(classId, materialId, token, command, originalFileName));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/classes/{classId}/materials/{materialId}")
+    @Operation(summary = "Xóa tài liệu của lớp")
+    public ResponseEntity<?> deleteMaterial(
+            @PathVariable Long classId,
+            @PathVariable Long materialId,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
+    ) {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
+            }
+            String token = authorizationHeader.substring("Bearer ".length()).trim();
+            teacherMaterialFacade.deleteMaterial(classId, materialId, token);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

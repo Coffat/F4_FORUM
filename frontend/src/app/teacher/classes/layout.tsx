@@ -41,7 +41,7 @@ export default function TeacherClassesLayout({
                 href={tab.href}
                 className={`px-4 py-2 rounded-xl text-sm font-bold transition ${
                   isActive
-                    ? "bg-emerald-600 text-white shadow-sm"
+                    ? "bg-[#0B3A9A] text-white shadow-sm"
                     : "text-slate-600 hover:bg-slate-50"
                 }`}
               >

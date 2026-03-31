@@ -87,7 +87,7 @@ export default async function TeacherClassDetailPage({
         </p>
         <Link
           href="/teacher/classes"
-          className="inline-block mt-4 text-sm font-bold text-emerald-700 hover:underline"
+          className="inline-block mt-4 text-sm font-bold text-blue-700 hover:underline"
         >
           Quay về danh sách lớp
         </Link>
@@ -113,7 +113,7 @@ export default async function TeacherClassDetailPage({
           >
             Xem tất cả học viên
           </Link>
-          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-xl">
+          <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
             {currentClass.status}
           </span>
         </div>

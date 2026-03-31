@@ -40,7 +40,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             JOIN FETCH s.classEntity c
             JOIN c.teachers t
             LEFT JOIN FETCH c.course
-            LEFT JOIN FETCH s.room
+            LEFT JOIN FETCH s.room r
+            LEFT JOIN FETCH r.branch
             WHERE t.id = :teacherId
               AND s.date BETWEEN :fromDate AND :toDate
             ORDER BY s.date ASC, s.startTime ASC

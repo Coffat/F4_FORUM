@@ -9,6 +9,11 @@ export type CreateMaterialState = {
   success: boolean;
 };
 
+export type MutateMaterialState = {
+  error: string | null;
+  success: boolean;
+};
+
 const schema = z.object({
   title: z.string().min(1, "Vui lòng nhập tiêu đề tài liệu!"),
   description: z.string().optional(),
@@ -60,6 +65,84 @@ export async function createMaterialAction(
     return { error: null, success: true };
   } catch (error) {
     console.error("[Materials] Upload failed:", error);
+    return { error: "Không kết nối được backend!", success: false };
+  }
+}
+
+export async function updateMaterialAction(
+  classId: string,
+  materialId: number,
+  formData: FormData
+): Promise<MutateMaterialState> {
+  const parsed = schema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message, success: false };
+  }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  if (!token) return { error: "Bạn chưa đăng nhập!", success: false };
+
+  const payload = new FormData();
+  payload.append("title", parsed.data.title);
+  if (parsed.data.description && parsed.data.description.trim().length > 0) {
+    payload.append("description", parsed.data.description);
+  }
+
+  const file = formData.get("file");
+  if (file instanceof File && file.size > 0) {
+    payload.append("file", file);
+  }
+
+  try {
+    const res = await fetch(
+      `http://localhost:8080/api/v1/teachers/classes/${classId}/materials/${materialId}`,
+      {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: payload,
+      }
+    );
+    if (!res.ok) {
+      return { error: (await res.text()) || "Cập nhật tài liệu thất bại!", success: false };
+    }
+
+    revalidatePath("/teacher/classes/materials");
+    return { error: null, success: true };
+  } catch (error) {
+    console.error("[Materials] Update failed:", error);
+    return { error: "Không kết nối được backend!", success: false };
+  }
+}
+
+export async function deleteMaterialAction(
+  classId: string,
+  materialId: number
+): Promise<MutateMaterialState> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  if (!token) return { error: "Bạn chưa đăng nhập!", success: false };
+
+  try {
+    const res = await fetch(
+      `http://localhost:8080/api/v1/teachers/classes/${classId}/materials/${materialId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    if (!res.ok) {
+      return { error: (await res.text()) || "Xóa tài liệu thất bại!", success: false };
+    }
+
+    revalidatePath("/teacher/classes/materials");
+    return { error: null, success: true };
+  } catch (error) {
+    console.error("[Materials] Delete failed:", error);
     return { error: "Không kết nối được backend!", success: false };
   }
 }

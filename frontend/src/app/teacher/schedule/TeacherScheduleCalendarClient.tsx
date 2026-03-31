@@ -130,7 +130,7 @@ export default function TeacherScheduleCalendarClient({
                 onClick={() => setSelectedDate(key)}
                 className={`min-h-24 rounded-xl border p-2 text-left transition ${
                   isSelected
-                    ? "border-emerald-500 bg-emerald-50"
+                    ? "border-blue-500 bg-blue-50"
                     : "border-slate-100 bg-slate-50 hover:bg-slate-100"
                 }`}
               >
@@ -141,7 +141,7 @@ export default function TeacherScheduleCalendarClient({
                   {dayEvents.slice(0, 2).map((e) => (
                     <div
                       key={e.scheduleId}
-                      className="truncate rounded-md bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-800"
+                      className="truncate rounded-md bg-blue-100 px-2 py-1 text-[10px] font-bold text-blue-800"
                     >
                       {e.startTime.slice(0, 5)} {e.classCode}
                     </div>

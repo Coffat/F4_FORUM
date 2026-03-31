@@ -1,6 +1,7 @@
 package com.f4.forum.service;
 
 import com.f4.forum.dto.request.CreateTeacherAssignmentCommand;
+import com.f4.forum.dto.request.UpdateTeacherAssignmentCommand;
 import com.f4.forum.dto.response.TeacherAssignmentResponse;
 import com.f4.forum.entity.Assignment;
 import com.f4.forum.entity.ClassEntity;
@@ -111,6 +112,69 @@ public class TeacherAssignmentFacade {
                 saved.getAttachmentUrl(),
                 saved.getDueDate()
         );
+    }
+
+    @Transactional
+    public TeacherAssignmentResponse updateAssignment(
+            Long classId,
+            Long assignmentId,
+            String token,
+            UpdateTeacherAssignmentCommand command,
+            String originalFileName
+    ) {
+        if (command.title() == null || command.title().isBlank()) {
+            throw new RuntimeException("Tiêu đề bài tập không được để trống!");
+        }
+        if (command.description() == null || command.description().isBlank()) {
+            throw new RuntimeException("Mô tả bài tập không được để trống!");
+        }
+
+        Long teacherId = resolveTeacherIdFromToken(token);
+        validateTeacherOwnsClass(teacherId, classId);
+
+        Assignment assignment = assignmentRepository
+                .findOwnedAssignment(assignmentId, classId, teacherId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài tập hoặc bạn không có quyền thao tác!"));
+
+        BigDecimal maxScore = command.maxScore() == null ? assignment.getMaxScore() : command.maxScore();
+        if (maxScore != null && maxScore.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Điểm tối đa phải lớn hơn 0!");
+        }
+
+        LocalDateTime dueDate = command.dueDateTime() == null ? assignment.getDueDate() : command.dueDateTime();
+
+        String attachmentUrl;
+        if (originalFileName == null || originalFileName.isBlank()) {
+            attachmentUrl = assignment.getAttachmentUrl();
+        } else {
+            attachmentUrl = "uploaded://" + originalFileName;
+        }
+
+        assignment.updateBasics(
+                command.title(),
+                command.description(),
+                dueDate,
+                maxScore,
+                attachmentUrl
+        );
+
+        return new TeacherAssignmentResponse(
+                assignment.getId(),
+                assignment.getTitle(),
+                assignment.getDescription(),
+                assignment.getAttachmentUrl(),
+                assignment.getDueDate()
+        );
+    }
+
+    @Transactional
+    public void deleteAssignment(Long classId, Long assignmentId, String token) {
+        Long teacherId = resolveTeacherIdFromToken(token);
+        validateTeacherOwnsClass(teacherId, classId);
+        Assignment assignment = assignmentRepository
+                .findOwnedAssignment(assignmentId, classId, teacherId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài tập hoặc bạn không có quyền thao tác!"));
+        assignmentRepository.delete(assignment);
     }
 
     private Long resolveTeacherIdFromToken(String token) {

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, Long> {
@@ -18,5 +19,16 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
             ORDER BY m.uploadDate DESC, m.id DESC
             """)
     List<Material> findByClassId(@Param("classId") Long classId);
+
+    @Query("""
+            SELECT m
+            FROM Material m
+            WHERE m.id = :materialId
+              AND m.classEntity.id = :classId
+            """)
+    Optional<Material> findByIdAndClassId(
+            @Param("materialId") Long materialId,
+            @Param("classId") Long classId
+    );
 }
 

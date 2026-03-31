@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveAttendanceAction } from "./actions";
+import { TickGreenIcon } from "@/components/icons/TickGreenIcon";
+import { CircleEmptyIcon } from "@/components/icons/CircleEmptyIcon";
 
 type AttendanceStudent = {
   enrollmentId: number;
@@ -80,22 +82,28 @@ export default function AttendanceSheetClient({
                 <p className="text-sm font-bold text-slate-900">{row.studentName}</p>
                 <p className="text-xs text-slate-500">Enrollment: {row.enrollmentStatus}</p>
               </div>
-              <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={row.editablePresent}
-                  onChange={(e) =>
-                    setRows((prev) =>
-                      prev.map((item) =>
-                        item.enrollmentId === row.enrollmentId
-                          ? { ...item, editablePresent: e.target.checked }
-                          : item
-                      )
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={row.editablePresent}
+                onClick={() =>
+                  setRows((prev) =>
+                    prev.map((item) =>
+                      item.enrollmentId === row.enrollmentId
+                        ? { ...item, editablePresent: !item.editablePresent }
+                        : item
                     )
-                  }
-                />
+                  )
+                }
+                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 rounded-xl px-3 py-2 hover:bg-white transition-colors border border-transparent hover:border-slate-200"
+              >
+                {row.editablePresent ? (
+                  <TickGreenIcon className="w-5 h-5 text-green-600" />
+                ) : (
+                  <CircleEmptyIcon className="w-5 h-5 text-slate-300" />
+                )}
                 Có mặt
-              </label>
+              </button>
             </div>
             <textarea
               value={row.editableRemarks}
@@ -110,7 +118,7 @@ export default function AttendanceSheetClient({
               }
               rows={2}
               placeholder="Ghi chú điểm danh (nếu có)"
-              className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         ))}
@@ -122,7 +130,7 @@ export default function AttendanceSheetClient({
           type="button"
           onClick={onSave}
           disabled={isPending}
-          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-70"
+          className="rounded-xl bg-[#0B3A9A] px-4 py-2 text-sm font-bold text-white hover:bg-blue-800 disabled:opacity-70"
         >
           {isPending ? "Đang lưu..." : "Lưu điểm danh"}
         </button>

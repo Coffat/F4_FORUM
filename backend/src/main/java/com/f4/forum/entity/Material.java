@@ -39,4 +39,16 @@ public class Material {
 
     @Column(name = "upload_date")
     private LocalDate uploadDate;
+
+    public void updateBasics(String title, String description, String fileUrl) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Tiêu đề tài liệu không được để trống!");
+        }
+        this.title = title.trim();
+        this.description = (description == null || description.isBlank()) ? null : description.trim();
+        if (fileUrl != null) {
+            this.fileUrl = fileUrl;
+        }
+        this.uploadDate = LocalDate.now();
+    }
 }

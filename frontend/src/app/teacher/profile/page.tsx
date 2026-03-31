@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { cookies } from "next/headers";
+import { BookOpen, CalendarDays, ClipboardCheck } from "lucide-react";
 
 type TeacherProfileResponse = {
   username: string;
@@ -79,25 +80,84 @@ export default async function TeacherProfilePage() {
   const profile = await getTeacherProfile();
   const overview = await getTeacherOverview();
 
+  const METRICS = [
+    {
+      title: "ACTIVE CLASSES",
+      value:
+        overview?.activeClassesCount !== undefined
+          ? overview.activeClassesCount.toLocaleString()
+          : "—",
+      icon: BookOpen,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+    },
+    {
+      title: "PENDING SUBMISSIONS",
+      value:
+        overview?.pendingSubmissionsCount !== undefined
+          ? overview.pendingSubmissionsCount.toLocaleString()
+          : "—",
+      icon: ClipboardCheck,
+      color: "text-purple-600",
+      bg: "bg-purple-50",
+    },
+    {
+      title: "THIS WEEK SESSIONS",
+      value:
+        overview?.weeklySessionsCount !== undefined
+          ? overview.weeklySessionsCount.toLocaleString()
+          : "—",
+      icon: CalendarDays,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+    },
+  ] as const;
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
       <div>
         <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-          Hồ sơ giảng viên
+          Teacher Dashboard
         </h2>
         <p className="text-slate-500 mt-1 font-medium">
-          Thông tin cá nhân và cấu hình cơ bản.
+          Snapshot metrics and your profile details.
         </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {METRICS.map((m) => {
+          const Icon = m.icon;
+          return (
+            <div
+              key={m.title}
+              className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                  {m.title}
+                </p>
+                <div className={`p-2 rounded-lg ${m.bg}`}>
+                  <Icon className={`w-4 h-4 ${m.color}`} />
+                </div>
+              </div>
+              <div className="flex items-end justify-between">
+                <span className="text-4xl font-bold text-[#0B3A9A] tracking-tight">
+                  {m.value}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="rounded-2xl border-slate-100 p-6">
           <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-4">
-            THÔNG TIN
+            PROFILE
           </p>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-700">Họ tên</span>
+              <span className="text-sm font-bold text-slate-700">Full name</span>
               <span className="text-sm font-medium text-slate-600">
                 {profile?.fullName ?? "—"}
               </span>
@@ -109,19 +169,19 @@ export default async function TeacherProfilePage() {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-700">Chuyên môn</span>
+              <span className="text-sm font-bold text-slate-700">Specialty</span>
               <span className="text-sm font-medium text-slate-600">
                 {profile?.specialty ?? "—"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-700">Ngày vào làm</span>
+              <span className="text-sm font-bold text-slate-700">Hire date</span>
               <span className="text-sm font-medium text-slate-600">
                 {profile?.hireDate ?? "—"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-700">Lần đăng nhập</span>
+              <span className="text-sm font-bold text-slate-700">Last login</span>
               <span className="text-sm font-medium text-slate-600">
                 {profile?.lastLogin ?? "—"}
               </span>
@@ -131,52 +191,33 @@ export default async function TeacherProfilePage() {
 
         <Card className="rounded-2xl border-slate-100 p-6 lg:col-span-2">
           <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-4">
-            TỔNG QUAN
+            SYSTEM STATUS
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                label: "Lớp đang dạy",
-                value:
-                  overview?.activeClassesCount !== undefined
-                    ? String(overview.activeClassesCount)
-                    : "—",
-              },
-              {
-                label: "Bài tập chờ chấm",
-                value:
-                  overview?.pendingSubmissionsCount !== undefined
-                    ? String(overview.pendingSubmissionsCount)
-                    : "—",
-              },
-              {
-                label: "Buổi dạy tuần này",
-                value:
-                  overview?.weeklySessionsCount !== undefined
-                    ? String(overview.weeklySessionsCount)
-                    : "—",
-              },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="bg-slate-50 border border-slate-100 rounded-2xl p-5"
-              >
+          {!profile ? (
+            <div className="bg-amber-50 border border-amber-100 text-amber-900 rounded-2xl p-4">
+              <p className="text-sm font-bold">Could not load profile.</p>
+              <p className="text-xs font-medium mt-1 text-amber-800">
+                Check backend is running and you are logged in as teacher.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5">
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  {item.label}
+                  Username
                 </p>
-                <p className="text-3xl font-bold text-emerald-700 mt-2">
-                  {item.value}
+                <p className="text-xl font-bold text-slate-900 mt-2">
+                  {profile.username}
                 </p>
               </div>
-            ))}
-          </div>
-
-          {!profile && (
-            <div className="mt-6 bg-amber-50 border border-amber-100 text-amber-900 rounded-2xl p-4">
-              <p className="text-sm font-bold">Chưa tải được hồ sơ.</p>
-              <p className="text-xs font-medium mt-1 text-amber-800">
-                Kiểm tra backend đang chạy và bạn đã đăng nhập role teacher.
-              </p>
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Role
+                </p>
+                <p className="text-xl font-bold text-slate-900 mt-2">
+                  {profile.role}
+                </p>
+              </div>
             </div>
           )}
         </Card>

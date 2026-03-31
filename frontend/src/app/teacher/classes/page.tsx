@@ -70,7 +70,7 @@ export default async function TeacherClassesOverviewPage() {
                   {clazz.activeStudents} học viên • {clazz.weeklySessions} buổi/tuần
                 </p>
               </div>
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-xl">
+              <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
                 {clazz.status}
               </span>
             </Link>
