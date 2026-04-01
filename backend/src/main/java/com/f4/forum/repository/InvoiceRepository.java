@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -22,4 +23,10 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     
     @Query("SELECT COUNT(i) FROM Invoice i WHERE i.status = :status")
     long countByStatus(InvoiceStatus status);
+    
+    /**
+     * Tìm các invoice có status và ngày quá hạn trước ngày chỉ định.
+     * Dùng cho việc tự động chuyển sang OVERDUE.
+     */
+    List<Invoice> findByStatusAndDueDateBefore(InvoiceStatus status, LocalDate date);
 }

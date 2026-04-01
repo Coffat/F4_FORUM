@@ -2,27 +2,28 @@ package com.f4.forum.command;
 
 /**
  * ===== COMMAND PATTERN =====
- * Interface định nghĩa cấu trúc của một Command.
- * Mỗi Command có execute() để thực thi và undo() để rollback.
- * 
- * @param <T> Kiểu trả về sau khi thực thi
+ * Interface định nghĩa các hành vi của một Command object.
+ * Đóng gói request thành object để dễ dàng xử lý, log, hoặc thực thi bất đồng bộ.
  */
 public interface Command<T> {
     
     /**
-     * Thực thi command và trả về kết quả.
+     * Thực thi command.
      */
     T execute();
     
     /**
-     * Hoàn tác command đã thực thi (rollback).
+     * Lấy tên command.
      */
-    void undo();
+    String getCommandName();
     
     /**
-     * Mô tả command cho logging.
+     * Lấy timestamp khi command được tạo.
      */
-    default String getDescription() {
-        return this.getClass().getSimpleName();
-    }
+    java.time.Instant getTimestamp();
+    
+    /**
+     * Lấy ID của command.
+     */
+    String getCommandId();
 }

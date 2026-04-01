@@ -1,72 +1,59 @@
 package com.f4.forum.command;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.util.UUID;
 
 /**
- * ===== ABSTRACT COMMAND =====
+ * ===== COMMAND PATTERN - Abstract Command =====
  * Base class cho tất cả Commands.
- * Cung cấp cơ chế logging và undo tracking.
- * 
- * @param <T> Kiểu trả về
+ * Template Method pattern: execute() gọi doExecute() để subclasses implement logic.
  */
-@Getter
-@Slf4j
 public abstract class AbstractCommand<T> implements Command<T> {
-
-    private long executionTime;
-    private boolean executed = false;
-    private boolean undone = false;
-
+    
+    private final Instant timestamp;
+    private final String commandId;
+    
+    protected AbstractCommand() {
+        this.timestamp = Instant.now();
+        this.commandId = UUID.randomUUID().toString();
+    }
+    
     @Override
     public final T execute() {
-        if (executed) {
-            log.warn("Command {} đã được execute trước đó, bỏ qua...", getDescription());
-            return getResult();
-        }
-        
-        long start = System.currentTimeMillis();
-        log.info("▶ Bắt đầu thực thi Command: {}", getDescription());
-        
-        T result = doExecute();
-        
-        executionTime = System.currentTimeMillis() - start;
-        executed = true;
-        
-        log.info("✅ Hoàn thành Command: {} trong {}ms", getDescription(), executionTime);
-        return result;
+        return doExecute();
     }
-
+    
     @Override
-    public final void undo() {
-        if (!executed) {
-            log.warn("Command {} chưa được execute, không thể undo", getDescription());
-            return;
-        }
-        
-        if (undone) {
-            log.warn("Command {} đã được undo trước đó", getDescription());
-            return;
-        }
-        
-        log.info("↩️ Bắt đầu undo Command: {}", getDescription());
-        doUndo();
-        undone = true;
-        log.info("✅ Hoàn thành undo Command: {}", getDescription());
+    public String getCommandName() {
+        return this.getClass().getSimpleName();
     }
-
+    
+    @Override
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+    
+    @Override
+    public String getCommandId() {
+        return commandId;
+    }
+    
     /**
-     * Method trừu tượng subclasses phải implement để thực thi business logic.
+     * Template method - subclasses implement business logic here.
      */
     protected abstract T doExecute();
-
+    
     /**
-     * Method trừu tượng subclasses phải implement để rollback.
+     * Undo method - subclasses can override if undo is supported.
      */
-    protected abstract void doUndo();
-
+    public void undo() {
+        throw new UnsupportedOperationException("Undo not supported for " + getCommandName());
+    }
+    
     /**
-     * Lấy kết quả đã lưu (nếu command đã execute).
+     * Check if undo is supported.
      */
-    protected abstract T getResult();
+    public boolean canUndo() {
+        return false;
+    }
 }

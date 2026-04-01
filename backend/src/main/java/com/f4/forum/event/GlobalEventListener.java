@@ -3,6 +3,7 @@ package com.f4.forum.event;
 import com.f4.forum.event.course.*;
 import com.f4.forum.event.enrollment.*;
 import com.f4.forum.event.user.*;
+import com.f4.forum.event.invoice.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -59,5 +60,19 @@ public class GlobalEventListener {
     public void handleEnrollmentDropped(EnrollmentDroppedEvent event) {
         log.info("❌ [Enrollment Event] Student {} dropped from class {} (reason: {})", 
                 event.getStudentId(), event.getClassId(), event.getReason());
+    }
+
+    @Async
+    @EventListener
+    public void handleInvoiceCreated(InvoiceCreatedEvent event) {
+        log.info("📄 [Invoice Event] Invoice created: {} for student {} ({}) - Amount: {}", 
+                event.getInvoiceCode(), event.getStudentName(), event.getStudentEmail(), event.getFinalAmount());
+    }
+
+    @Async
+    @EventListener
+    public void handleInvoicePaid(InvoicePaidEvent event) {
+        log.info("💰 [Invoice Event] Invoice paid: {} by student {} - Amount: {}", 
+                event.getInvoiceCode(), event.getStudentName(), event.getAmountPaid());
     }
 }

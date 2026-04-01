@@ -4,14 +4,19 @@ import com.f4.forum.dto.invoice.CreateInvoiceCommand;
 import com.f4.forum.dto.invoice.InvoiceResponse;
 import com.f4.forum.entity.*;
 import com.f4.forum.entity.enums.InvoiceStatus;
+import com.f4.forum.event.invoice.InvoiceCreatedEvent;
+import com.f4.forum.event.invoice.InvoicePaidEvent;
 import com.f4.forum.repository.*;
+import com.f4.forum.state.invoice.InvoiceStateContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +35,8 @@ public class StaffInvoiceFacade {
     private final EnrollmentRepository enrollmentRepository;
     private final PromotionRepository promotionRepository;
     private final CourseRepository courseRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final InvoiceStateContext invoiceStateContext;
 
     /**
      * Tạo hóa đơn mới cho student.
@@ -85,7 +92,18 @@ public class StaffInvoiceFacade {
         log.info("Invoice created with ID: {}, base: {}, final: {}", 
                 savedInvoice.getId(), savedInvoice.getBaseAmount(), savedInvoice.getFinalAmount());
 
-        // 6. Map to response
+        // 7. Publish event sau khi transaction thành công
+        eventPublisher.publishEvent(new InvoiceCreatedEvent(
+                savedInvoice.getId(),
+                "INV-" + String.format("%06d", savedInvoice.getId()),
+                savedInvoice.getStudent().getId(),
+                savedInvoice.getStudent().getFullName(),
+                savedInvoice.getStudent().getEmail(),
+                savedInvoice.getFinalAmount(),
+                savedInvoice.getDueDate()
+        ));
+
+        // 8. Map to response
         return mapToResponse(savedInvoice);
     }
 
@@ -171,6 +189,59 @@ public class StaffInvoiceFacade {
                         .valid(p.isValid())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Thanh toán hóa đơn sử dụng State Pattern.
+     * Publish InvoicePaidEvent sau khi thanh toán thành công.
+     */
+    @Transactional
+    public InvoiceResponse payInvoice(Long invoiceId, BigDecimal amount) {
+        log.info("Processing payment for invoice ID: {}, amount: {}", invoiceId, amount);
+        
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invoice not found: " + invoiceId));
+        
+        // Sử dụng State Pattern để xử lý thanh toán
+        if (!invoiceStateContext.canPay(invoice)) {
+            throw new IllegalStateException("Cannot pay invoice in current state: " + invoice.getStatus());
+        }
+        
+        invoiceStateContext.pay(invoice, amount);
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+        
+        // Publish event cho notification
+        eventPublisher.publishEvent(new InvoicePaidEvent(
+                savedInvoice.getId(),
+                "INV-" + String.format("%06d", savedInvoice.getId()),
+                savedInvoice.getStudent().getId(),
+                savedInvoice.getStudent().getFullName(),
+                amount
+        ));
+        
+        log.info("Invoice {} paid successfully via State Pattern", invoiceId);
+        return mapToResponse(savedInvoice);
+    }
+
+    /**
+     * Hủy hóa đơn sử dụng State Pattern.
+     */
+    @Transactional
+    public InvoiceResponse cancelInvoice(Long invoiceId) {
+        log.info("Cancelling invoice ID: {}", invoiceId);
+        
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invoice not found: " + invoiceId));
+        
+        if (!invoiceStateContext.canCancel(invoice)) {
+            throw new IllegalStateException("Cannot cancel invoice in current state: " + invoice.getStatus());
+        }
+        
+        invoiceStateContext.cancel(invoice);
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+        
+        log.info("Invoice {} cancelled successfully via State Pattern", invoiceId);
+        return mapToResponse(savedInvoice);
     }
 
     /**

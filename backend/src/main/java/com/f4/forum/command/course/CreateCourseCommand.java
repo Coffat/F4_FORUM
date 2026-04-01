@@ -56,7 +56,7 @@ public class CreateCourseCommand extends AbstractCommand<Course> {
     }
 
     @Override
-    protected void doUndo() {
+    public void undo() {
         if (createdCourse != null && createdCourse.getId() != null) {
             courseRepository.delete(createdCourse);
             log.info("Đã rollback: Xóa course ID {}", createdCourse.getId());
@@ -64,12 +64,12 @@ public class CreateCourseCommand extends AbstractCommand<Course> {
     }
 
     @Override
-    protected Course getResult() {
-        return createdCourse;
+    public boolean canUndo() {
+        return createdCourse != null && createdCourse.getId() != null;
     }
 
     @Override
-    public String getDescription() {
-        return "CreateCourseCommand[" + code + "]";
+    public String getCommandName() {
+        return "CreateCourseCommand";
     }
 }
