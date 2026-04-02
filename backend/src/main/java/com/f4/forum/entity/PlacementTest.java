@@ -26,13 +26,27 @@ public class PlacementTest {
     private LocalDate testDate;
 
     @Column(precision = 5, scale = 2)
-    private BigDecimal score;
+    private BigDecimal listening;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal speaking;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal reading;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal writing;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal overall;
 
     @Column(name = "recommended_level", length = 50)
     private String recommendedLevel;
     
+/*
     public void grade(BigDecimal score, String recommendedLevel) {
-        this.score = score;
+        this.overall = score;
         this.recommendedLevel = recommendedLevel;
     }
+    */
 }

@@ -48,8 +48,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE users (
     version BIGINT DEFAULT 0,
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
     full_name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    avatar_url TEXT,
     email VARCHAR(255) UNIQUE,
     status VARCHAR(50) DEFAULT 'ACTIVE',
     user_type ENUM('STUDENT', 'TEACHER', 'STAFF') NOT NULL,
@@ -74,6 +77,7 @@ CREATE TABLE students (
     gender VARCHAR(20),
     address TEXT,
     registration_date DATE,
+    target_score DECIMAL(5, 2),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -193,7 +197,11 @@ CREATE TABLE placement_tests (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     student_id BIGINT NOT NULL,
     test_date DATE,
-    score DECIMAL(5, 2),
+    listening DECIMAL(5, 2),
+    speaking DECIMAL(5, 2),
+    reading DECIMAL(5, 2),
+    writing DECIMAL(5, 2),
+    overall DECIMAL(5, 2),
     recommended_level VARCHAR(50),
     FOREIGN KEY (student_id) REFERENCES students(user_id) ON DELETE CASCADE
 );
@@ -213,6 +221,8 @@ CREATE TABLE certificates (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     student_id BIGINT NOT NULL,
     course_id BIGINT NOT NULL,
+    certificate_type VARCHAR(100),
+    score VARCHAR(50),
     certificate_url TEXT,
     issue_date DATE,
     FOREIGN KEY (student_id) REFERENCES students(user_id) ON DELETE CASCADE,
@@ -430,4 +440,28 @@ INSERT INTO class_teachers (class_id, teacher_id) VALUES
 (6, 2), -- ADV → Ms. Lan Anh
 (7, 5), -- PRO → Mr. Van Duc
 (8, 5); -- EXP → Mr. Van Duc
+
+
+-- ── Học Viên (Tài) ────────────────────────────────────────────────────
+-- ID: 6
+INSERT INTO users (id, first_name, last_name, full_name, phone, avatar_url, email, status, user_type)
+VALUES (6, 'Tài', 'Đặng Ngọc', 'Đặng Ngọc Tài', '0988777666', 'https://i.pravatar.cc/100?img=12', 'ngoctai@f4forum.com', 'ACTIVE', 'STUDENT');
+
+INSERT INTO students (user_id, date_of_birth, gender, address, registration_date, target_score)
+VALUES (6, '2003-05-15', 'MALE', 'Ho Chi Minh City, Vietnam', '2026-03-30', 7.5);
+
+INSERT INTO placement_tests (student_id, test_date, listening, speaking, reading, writing, overall, recommended_level)
+VALUES (6, '2026-03-25', 6.5, 7.0, 6.0, 6.5, 6.5, 'INTERMEDIATE');
+
+INSERT INTO certificates (student_id, course_id, certificate_type, score, certificate_url, issue_date)
+VALUES (6, 1, 'IELTS Academic', '6.5', 'https://example.com/cert/67890', '2025-12-20');
+
+INSERT INTO user_accounts (user_id, username, password_hash, role)
+VALUES (6, 'tai', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT');
+
+-- Bonus: Cho học viên Tài tham gia 1-2 lớp để bạn test giao diện học viên
+INSERT INTO enrollments (student_id, class_id, enrollment_date, status)
+VALUES 
+(6, 1, '2026-03-30', 'ENROLLED'), -- IELTS Foundation
+(6, 4, '2026-03-30', 'ENROLLED'); -- IELTS Intermediate
 

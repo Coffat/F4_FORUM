@@ -258,3 +258,83 @@ Module cung cấp dữ liệu tổng hợp cho trang **Staff Operations Dashboar
 ---
 
 *Cập nhật: 29/03/2026 bởi Senior Backend Architect - Áp dụng Facade + Builder Pattern*
+
+## 🎓 6. Student Portal Module
+
+Module dành riêng cho trải nghiệm của học viên (Student Hub).
+
+### Lấy dữ liệu Dashboard (GetDashboard)
+- **URL**: `/api/v1/student/dashboard`
+- **Method**: `GET`
+- **Auth required**: Yes (ROLE_STUDENT)
+- **Mô tả**: Trả về lời chào cá nhân và danh sách lớp đang học.
+
+### Lấy hồ sơ chi tiết (GetProfile)
+Lấy toàn bộ thông tin cá nhân, học thuật, điểm đầu vào và chứng chỉ.
+
+- **URL**: `/api/v1/student/profile`
+- **Method**: `GET`
+- **Auth required**: Yes (ROLE_STUDENT)
+- **Bảo mật**: Anti-IDOR (ID được trích xuất từ Token).
+
+#### Response - Thành công (HTTP 200 OK)
+```json
+{
+  "firstName": "Tài",
+  "lastName": "Đặng Ngọc",
+  "email": "ngoctai@f4forum.com",
+  "phoneNumber": "0988777666",
+  "dateOfBirth": "2003-05-15",
+  "avatarUrl": "https://i.pravatar.cc/100?img=12",
+  "targetScore": 7.5,
+  "admissionDate": "2026-03-30",
+  "placementTests": [
+    {
+      "testDate": "2026-03-25",
+      "listening": 6.5,
+      "speaking": 7.0,
+      "reading": 6.0,
+      "writing": 6.5,
+      "overall": 6.5
+    }
+  ],
+  "certificates": [
+    {
+      "type": "IELTS Academic",
+      "issueDate": "2025-12-20",
+      "score": "6.5",
+      "url": "https://example.com/cert/67890"
+    }
+  ]
+}
+```
+
+### Cập nhật hồ sơ (UpdateProfile)
+Cho phép học viên tự cập nhật thông tin cá nhân.
+
+- **URL**: `/api/v1/student/profile`
+- **Method**: `PUT`
+- **Auth required**: Yes (ROLE_STUDENT)
+- **Validation**:
+  - `phoneNumber`: 10-11 chữ số.
+  - `dateOfBirth`: Phải ở quá khứ.
+  - `targetScore`: Không được để trống.
+
+#### Request Body
+```json
+{
+  "phoneNumber": "0988777999",
+  "dateOfBirth": "2003-05-15",
+  "avatarUrl": "https://i.pravatar.cc/100?img=12",
+  "targetScore": 8.0
+}
+```
+
+#### Response - Thành công (HTTP 200 OK)
+```text
+Cập nhật hồ sơ thành công!
+```
+
+---
+
+*Cập nhật: 02/04/2026 bởi Senior Backend Architect - Triển khai luồng Command Profile (Rich Domain + Validation)*

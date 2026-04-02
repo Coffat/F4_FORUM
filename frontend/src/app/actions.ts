@@ -73,7 +73,7 @@ export async function loginAction(
     case 'ROLE_TEACHER':
       redirect('/'); // Chưa có route riêng cho teacher
     case 'ROLE_STUDENT':
-      redirect('/'); // Chưa có route riêng cho student
+      redirect('/student/dashboard');
     default:
       redirect('/login');
   }

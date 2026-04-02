@@ -19,10 +19,19 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "first_name")
+    private String firstName;
+    
+    @Column(name = "last_name")
+    private String lastName;
+
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
     private String phone;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Column(unique = true)
     private String email;
@@ -51,5 +60,19 @@ public class User extends BaseEntity {
     public void updateBasicInfo(String fullName, UserStatus status) {
         this.fullName = fullName;
         this.status = status;
+    }
+
+    /**
+     * Hành vi cập nhật dữ liệu cá nhân cho User.
+     * Đảm bảo tính bao đóng và logic nghiệp vụ tập trung.
+     */
+    public void updatePersonalData(String phone, String avatarUrl, String email) {
+        if (phone != null && !phone.isBlank()) {
+            this.phone = phone;
+        }
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+        this.avatarUrl = avatarUrl;
     }
 }

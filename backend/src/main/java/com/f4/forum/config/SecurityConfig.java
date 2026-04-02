@@ -1,21 +1,33 @@
 package com.f4.forum.config;
 
+import com.f4.forum.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Senior Backend Architecture - Security Configuration.
+ * Tích hợp Filter giải mã JWT và quản lý phân quyền Endpoint.
+ */
 @Configuration
+@RequiredArgsConstructor
+@EnableMethodSecurity // Kích hoạt @PreAuthorize("hasRole(...)")
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,7 +51,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println(">>> Custom SecurityConfig is active");
+        System.out.println(">>> Security Architecture: ACTIVE with JWT Filter");
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -47,17 +59,18 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()          // Auth (đăng nhập)
-                .requestMatchers("/api/v1/courses/**").permitAll()        // Courses (công khai)
-                .requestMatchers("/api/v1/branches/**").permitAll()       // Branches (công khai cho dev)
-                .requestMatchers("/api/v1/rooms/**").permitAll()          // Rooms API (mới thêm)
-                .requestMatchers("/api/v1/classes/**").permitAll()        // Classes module
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
-                .requestMatchers("/api/admin/**").permitAll()             // Admin functionalities (Until JWT Filter is set up)
-                .requestMatchers("/api/v1/personnel/**").permitAll()      // Personnel module
-                .requestMatchers("/api/v1/staff-dashboard/**").permitAll() // Staff Dashboard metrics
+                .requestMatchers("/api/v1/auth/**").permitAll()           // Login/Auth
+                .requestMatchers("/api/v1/student/**").hasRole("STUDENT") // Bảo vệ module học viên (PHẢI LÀ STUDENT)
+                .requestMatchers("/api/v1/courses/**").permitAll()         // Courses công khai
+                .requestMatchers("/api/v1/branches/**").permitAll()
+                .requestMatchers("/api/v1/rooms/**").permitAll()
+                .requestMatchers("/api/v1/classes/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/api/v1/staff-dashboard/**").permitAll()  // Vẫn để permitAll cho tính tương thích cũ
                 .anyRequest().authenticated()
-            );
+            )
+            // Kích hoạt JWT Filter trước các Filter mặc định của Spring
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
