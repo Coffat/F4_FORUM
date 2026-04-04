@@ -18,15 +18,20 @@ public class CreateInvoiceCommandHandler extends AbstractCommand<InvoiceResponse
     }
     
     @Override
-    public InvoiceResponse execute() {
-        log.info("📨 [COMMAND] Executing CreateInvoiceCommand: {}", getCommandId());
+    protected InvoiceResponse doExecute() {
+        log.info("Executing CreateInvoiceCommand: {}", getCommandId());
         long startTime = System.currentTimeMillis();
         
         InvoiceResponse result = staffInvoiceFacade.createInvoice(command);
         
         long duration = System.currentTimeMillis() - startTime;
-        log.info("📬 [COMMAND] CreateInvoiceCommand completed in {}ms", duration);
+        log.info("CreateInvoiceCommand completed in {}ms", duration);
         
         return result;
+    }
+    
+    @Override
+    public String getCommandName() {
+        return "CreateInvoiceCommandHandler";
     }
 }
