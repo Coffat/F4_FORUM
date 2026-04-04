@@ -28,7 +28,7 @@ export function PersonalInfoTab({ profile }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<UpdateProfileInput>({
-    resolver: zodResolver(updateProfileSchema),
+    resolver: zodResolver(updateProfileSchema) as any,
     defaultValues: {
       phoneNumber: profile.phoneNumber || "",
       dateOfBirth: profile.dateOfBirth || "",

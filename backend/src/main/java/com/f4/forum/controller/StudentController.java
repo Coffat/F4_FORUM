@@ -27,6 +27,7 @@ public class StudentController {
     private final StudentQueryService studentQueryService;
     private final StudentCommandService studentCommandService;
     private final com.f4.forum.service.query.ScheduleQueryService scheduleQueryService;
+    private final com.f4.forum.service.query.StudentAcademicFacade studentAcademicFacade;
 
     /**
      * Endpoint lấy dữ liệu Dashboard cho Student.
@@ -85,5 +86,18 @@ public class StudentController {
         String currentUsername = authentication.getName();
         studentCommandService.updateProfileByUsername(currentUsername, command);
         return ResponseEntity.ok("Cập nhật hồ sơ thành công!");
+    }
+
+    /**
+     * Endpoint lấy bảng điểm và quá trình học tập (Transcript).
+     * Bao gồm: Thi đầu vào, Danh sách Chứng chỉ, Tiến độ quá trình, và Kết quả học qua các môn.
+     */
+    @GetMapping("/me/academic-results")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Lấy bảng điểm và quá trình học tập (Transcript)", 
+               description = "Trả về điểm thi, chứng chỉ, điểm danh và tiến độ làm bài tính trên các khóa đã và đang học.")
+    public com.f4.forum.dto.response.StudentAcademicResponse getMyAcademicResults(org.springframework.security.core.Authentication authentication) {
+        String currentUsername = authentication.getName();
+        return studentAcademicFacade.getStudentTranscript(currentUsername);
     }
 }

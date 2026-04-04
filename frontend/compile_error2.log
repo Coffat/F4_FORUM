@@ -1,0 +1,6 @@
+src/components/student/academic-results-client.tsx(44,13): error TS2322: Type '{ children: Element[]; defaultValue: string; className: string; }' is not assignable to type 'IntrinsicAttributes & { value: string; onValueChange: (value: string) => void; children: ReactNode; className?: string | undefined; }'.
+  Property 'defaultValue' does not exist on type 'IntrinsicAttributes & { value: string; onValueChange: (value: string) => void; children: ReactNode; className?: string | undefined; }'.
+src/components/student/academic-results-client.tsx(126,24): error TS2322: Type '{ children: Element[]; type: string; collapsible: true; className: string; }' is not assignable to type 'IntrinsicAttributes & Props<any>'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & Props<any>'.
+src/components/student/academic-results-client.tsx(148,100): error TS2322: Type '{ value: number; className: string; indicatorClassName: string; }' is not assignable to type 'IntrinsicAttributes & ProgressRootProps'.
+  Property 'indicatorClassName' does not exist on type 'IntrinsicAttributes & ProgressRootProps'.
