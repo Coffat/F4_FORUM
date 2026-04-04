@@ -48,8 +48,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE users (
     version BIGINT DEFAULT 0,
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
     full_name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    avatar_url TEXT,
     email VARCHAR(255) UNIQUE,
     status VARCHAR(50) DEFAULT 'ACTIVE',
     user_type ENUM('STUDENT', 'TEACHER', 'STAFF', 'ADMIN') NOT NULL,
@@ -74,6 +77,7 @@ CREATE TABLE students (
     gender VARCHAR(20),
     address TEXT,
     registration_date DATE,
+    target_score DECIMAL(5, 2),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -183,7 +187,11 @@ CREATE TABLE placement_tests (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     student_id BIGINT NOT NULL,
     test_date DATE,
-    score DECIMAL(5, 2),
+    listening DECIMAL(5, 2),
+    speaking DECIMAL(5, 2),
+    reading DECIMAL(5, 2),
+    writing DECIMAL(5, 2),
+    overall DECIMAL(5, 2),
     recommended_level VARCHAR(50),
     FOREIGN KEY (student_id) REFERENCES students(user_id) ON DELETE CASCADE
 );
@@ -419,17 +427,58 @@ INSERT INTO class_teachers (class_id, teacher_id) VALUES
 (7, 5), -- PRO → Mr. Van Duc
 (8, 5); -- EXP → Mr. Van Duc
 
+
+-- ── Học Viên (Tài) ────────────────────────────────────────────────────
+-- ID: 6
+INSERT INTO users (id, first_name, last_name, full_name, phone, avatar_url, email, status, user_type)
+VALUES (6, 'Tài', 'Đặng Ngọc', 'Đặng Ngọc Tài', '0988777666', 'https://i.pravatar.cc/100?img=12', 'ngoctai@f4forum.com', 'ACTIVE', 'STUDENT');
+
+INSERT INTO students (user_id, date_of_birth, gender, address, registration_date, target_score)
+VALUES (6, '2003-05-15', 'MALE', 'Ho Chi Minh City, Vietnam', '2026-03-30', 7.5);
+
+INSERT INTO placement_tests (student_id, test_date, listening, speaking, reading, writing, overall, recommended_level)
+VALUES (6, '2026-03-25', 6.5, 7.0, 6.0, 6.5, 6.5, 'INTERMEDIATE');
+
+INSERT INTO certificates (student_id, course_id, certificate_type, score, certificate_url, issue_date)
+VALUES (6, 1, 'IELTS Academic', '6.5', 'https://example.com/cert/67890', '2025-12-20');
+
+INSERT INTO user_accounts (user_id, username, password_hash, role)
+VALUES (6, 'tai', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT');
+
+-- Bonus: Cho học viên Tài tham gia 1-2 lớp để bạn test giao diện học viên
+INSERT INTO enrollments (student_id, class_id, enrollment_date, status)
+VALUES 
+(6, 1, '2026-03-30', 'ENROLLED'), -- IELTS Foundation
+(6, 4, '2026-03-30', 'ENROLLED'); -- IELTS Intermediate
+
+-- SEED DATA cho Schedules (Một số buổi học trong tháng 04/2026)
+INSERT INTO schedules (id, class_id, room_id, date, start_time, end_time, is_online, meeting_link) VALUES
+-- Lớp Foundation (Thứ 3, 5, 7)
+(1, 1, 1, '2026-04-07', '08:00:00', '10:30:00', FALSE, NULL),
+(2, 1, 1, '2026-04-09', '08:00:00', '10:30:00', FALSE, NULL),
+(3, 1, 1, '2026-04-11', '08:00:00', '10:30:00', FALSE, NULL),
+-- Lớp Intermediate (Thứ 2, 4, 6) - Online
+(4, 4, 2, '2026-04-13', '18:30:00', '21:00:00', TRUE, 'https://meet.google.com/abc-defg-hij'),
+(5, 4, 2, '2026-04-15', '18:30:00', '21:00:00', TRUE, 'https://meet.google.com/abc-defg-hij'),
+(6, 4, 2, '2026-04-17', '18:30:00', '21:00:00', TRUE, 'https://meet.google.com/abc-defg-hij');
+
+-- Đánh dấu điểm danh cho Tai tại buổi học đầu tiên (test UI)
+-- Tìm enrollment_id của Tai trong lớp 1 (Thường là 1 nếu là record đầu tiên)
+-- Tuy nhiên để an toàn thì dùng subquery hoặc hardcode 1 nếu chắc chắn
+INSERT INTO attendances (schedule_id, enrollment_id, is_present, remarks) VALUES
+(1, 1, TRUE, 'Học viên đi đúng giờ, tích cực phát biểu');
+
 -- ── Tài khoản Staff & Teacher Test (Mật khẩu: "1") ──────────────────────
 INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
-(6, 'Nhân viên Vận hành', '0999888777', 'staff@f4forum.com', 'ACTIVE', 'STAFF'),
-(7, 'Giảng viên Demo', '0888777666', 'teacher@f4forum.com', 'ACTIVE', 'TEACHER');
+(7, 'Nhân viên Vận hành', '0999888777', 'staff@f4forum.com', 'ACTIVE', 'STAFF'),
+(8, 'Giảng viên Demo', '0888777666', 'teacher@f4forum.com', 'ACTIVE', 'TEACHER');
 
-INSERT INTO staff_members (user_id, department) VALUES (6, 'Operations');
-INSERT INTO teachers (user_id, specialty, hire_date) VALUES (7, 'IELTS Specialist', '2024-01-01');
+INSERT INTO staff_members (user_id, department) VALUES (7, 'Operations');
+INSERT INTO teachers (user_id, specialty, hire_date) VALUES (8, 'IELTS Specialist', '2024-01-01');
 
 INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
-(6, 'staff', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STAFF'),
-(7, 'teacher', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_TEACHER');
+(7, 'staff', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STAFF'),
+(8, 'teacher', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_TEACHER');
 
 
 -- ==========================================
@@ -442,48 +491,49 @@ INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
 
 -- ── Students Demo (để có enrollment/submission) ───────────────────────
 INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
-(21, 'Học viên Demo A', '0901000001', 'student.a@f4forum.com', 'ACTIVE', 'STUDENT'),
-(22, 'Học viên Demo B', '0901000002', 'student.b@f4forum.com', 'ACTIVE', 'STUDENT');
+(9, 'Học viên Demo A', '0901000001', 'student.a@f4forum.com', 'ACTIVE', 'STUDENT'),
+(10, 'Học viên Demo B', '0901000002', 'student.b@f4forum.com', 'ACTIVE', 'STUDENT');
 
 INSERT INTO students (user_id, date_of_birth, gender, address, registration_date) VALUES
-(21, '2006-05-10', 'Nam', 'Q1, HCM', '2026-03-01'),
-(22, '2007-02-20', 'Nữ', 'Q3, HCM', '2026-03-05');
+(9, '2006-05-10', 'Nam', 'Q1, HCM', '2026-03-01'),
+(10, '2007-02-20', 'Nữ', 'Q3, HCM', '2026-03-05');
 
 -- Tài khoản demo cho học viên (mật khẩu: "1")
 INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
-(21, 'student_a', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT'),
-(22, 'student_b', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT');
+(9, 'student_a', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT'),
+(10, 'student_b', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT');
 
 -- ── Class demo do teacher (id=7) phụ trách ────────────────────────────
 INSERT INTO classes (id, course_id, default_room_id, class_code, start_date, end_date, max_students, status) VALUES
 (9, 1, 1, 'TEA-2026-01', '2026-03-25', '2026-06-30', 15, 'OPEN');
 
 INSERT INTO class_teachers (class_id, teacher_id) VALUES
-(9, 7); -- Teacher Demo (user_id=7)
+(9, 8); -- Teacher Demo (user_id=8)
 
 -- ── Schedule tuần hiện tại (để "buổi dạy tuần này" có data) ───────────
 INSERT INTO schedules (id, class_id, room_id, date, start_time, end_time, is_online, meeting_link) VALUES
-(1, 9, 1, '2026-03-30', '18:00:00', '20:00:00', FALSE, NULL),
-(2, 9, 1, '2026-04-01', '18:00:00', '20:00:00', FALSE, NULL),
-(3, 9, 1, '2026-04-03', '18:00:00', '20:00:00', FALSE, NULL);
+(10, 9, 1, '2026-03-30', '18:00:00', '20:00:00', FALSE, NULL),
+(11, 9, 1, '2026-04-01', '18:00:00', '20:00:00', FALSE, NULL),
+(12, 9, 1, '2026-04-03', '18:00:00', '20:00:00', FALSE, NULL);
 
 -- ── Enrollments (gắn học viên vào lớp) ────────────────────────────────
 INSERT INTO enrollments (id, student_id, class_id, enrollment_date, status) VALUES
-(1, 21, 9, '2026-03-26', 'ENROLLED'),
-(2, 22, 9, '2026-03-26', 'ENROLLED');
+(10, 9, 9, '2026-03-26', 'ENROLLED'),
+(11, 10, 9, '2026-03-26', 'ENROLLED');
 
 -- ── Attendance mẫu cho buổi đầu tiên ──────────────────────────────────
 INSERT INTO attendances (id, schedule_id, enrollment_id, is_present, remarks) VALUES
-(1, 1, 1, TRUE,  'Đúng giờ'),
-(2, 1, 2, FALSE, 'Vắng (demo)');
+(10, 10, 10, TRUE,  'Đúng giờ'),
+(11, 10, 11, FALSE, 'Vắng (demo)');
 
 -- ── Assignments + Submissions (để có "bài tập chờ chấm") ──────────────
 INSERT INTO assignments (id, class_id, teacher_id, title, description, attachment_url, due_date, max_score) VALUES
-(1, 9, 7, 'Homework 01 - Vocabulary', 'Làm bài tập từ vựng Unit 1 (demo).', NULL, '2026-04-02 23:59:00', 10.0),
-(2, 9, 7, 'Homework 02 - Writing Task', 'Viết đoạn văn 150 từ (demo).', NULL, '2026-04-05 23:59:00', 20.0);
+(10, 9, 8, 'Homework 01 - Vocabulary', 'Làm bài tập từ vựng Unit 1 (demo).', NULL, '2026-04-02 23:59:00', 10.0),
+(11, 9, 8, 'Homework 02 - Writing Task', 'Viết đoạn văn 150 từ (demo).', NULL, '2026-04-05 23:59:00', 20.0);
 
 INSERT INTO submissions (id, assignment_id, student_id, teacher_id, submission_date, file_url, score, teacher_comment, status) VALUES
-(1, 1, 21, 7, '2026-03-30 20:30:00', 'https://example.com/submission/student_a_hw01.pdf', NULL, NULL, 'SUBMITTED'),
-(2, 1, 22, 7, '2026-03-30 20:40:00', 'https://example.com/submission/student_b_hw01.pdf', NULL, NULL, 'SUBMITTED'),
-(3, 2, 21, 7, '2026-04-01 20:30:00', 'https://example.com/submission/student_a_hw02.pdf', NULL, NULL, 'SUBMITTED');
+(10, 10, 9, 8, '2026-03-30 20:30:00', 'https://example.com/submission/student_a_hw01.pdf', NULL, NULL, 'SUBMITTED'),
+(11, 10, 10, 8, '2026-03-30 20:40:00', 'https://example.com/submission/student_b_hw01.pdf', NULL, NULL, 'SUBMITTED'),
+(12, 11, 9, 8, '2026-04-01 20:30:00', 'https://example.com/submission/student_a_hw02.pdf', NULL, NULL, 'SUBMITTED');
+
 

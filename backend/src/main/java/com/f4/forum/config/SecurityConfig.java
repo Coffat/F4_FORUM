@@ -1,21 +1,33 @@
 package com.f4.forum.config;
 
+import com.f4.forum.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Senior Backend Architecture - Security Configuration.
+ * Tích hợp Filter giải mã JWT và quản lý phân quyền Endpoint.
+ */
 @Configuration
+@RequiredArgsConstructor
+@EnableMethodSecurity // Kích hoạt @PreAuthorize("hasRole(...)")
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,7 +51,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println(">>> Custom SecurityConfig is active");
+        System.out.println(">>> Security Architecture: ACTIVE with JWT Filter");
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -47,21 +59,27 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()          // Auth (đăng nhập)
-                .requestMatchers("/api/v1/courses/**").permitAll()        // Courses (công khai)
-                .requestMatchers("/api/v1/teachers/**").permitAll()       // Teacher Portal (mock token)
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
-                .requestMatchers("/api/admin/**").permitAll()             // Admin functionalities (Until JWT Filter is set up)
-                .requestMatchers("/api/v1/personnel/**").permitAll()      // Personnel module
-                .requestMatchers("/api/v1/staff-dashboard/**").permitAll() // Staff Dashboard metrics
-                .requestMatchers("/api/v1/staff/courses/**").permitAll()  // Staff Courses
-                .requestMatchers("/api/v1/staff/classes/**").permitAll()  // Staff Classes
-                .requestMatchers("/api/v1/staff/schedules/**").permitAll() // Staff Schedules
-                .requestMatchers("/api/v1/staff/rooms/**").permitAll()     // Staff Rooms
-                .requestMatchers("/api/v1/staff/invoices/**").permitAll()  // Staff Invoices
-                .requestMatchers("/api/v1/staff/promotions/**").permitAll()  // Staff Promotions
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/student/**").hasRole("STUDENT") 
+                .requestMatchers("/api/v1/courses/**").permitAll()
+                .requestMatchers("/api/v1/teachers/**").permitAll()
+                .requestMatchers("/api/v1/branches/**").permitAll()
+                .requestMatchers("/api/v1/rooms/**").permitAll()
+                .requestMatchers("/api/v1/classes/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/api/admin/**").permitAll()
+                .requestMatchers("/api/v1/personnel/**").permitAll()
+                .requestMatchers("/api/v1/staff-dashboard/**").permitAll()
+                .requestMatchers("/api/v1/staff/courses/**").permitAll()
+                .requestMatchers("/api/v1/staff/classes/**").permitAll()
+                .requestMatchers("/api/v1/staff/schedules/**").permitAll()
+                .requestMatchers("/api/v1/staff/rooms/**").permitAll()
+                .requestMatchers("/api/v1/staff/invoices/**").permitAll()
+                .requestMatchers("/api/v1/staff/promotions/**").permitAll()
                 .anyRequest().authenticated()
-            );
+            )
+            // Kích hoạt JWT Filter trước các Filter mặc định của Spring
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
