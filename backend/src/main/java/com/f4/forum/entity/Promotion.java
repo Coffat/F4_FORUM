@@ -1,5 +1,8 @@
 package com.f4.forum.entity;
 
+import com.f4.forum.entity.strategy.DiscountStrategyFactory;
+import com.f4.forum.entity.strategy.FixedDiscountStrategy;
+import com.f4.forum.entity.strategy.PercentDiscountStrategy;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,8 +24,12 @@ public class Promotion {
     @Column(name = "promo_code", nullable = false, unique = true, length = 50)
     private String promoCode;
 
-    @Column(name = "discount_percent", precision = 5, scale = 2)
-    private BigDecimal discountPercent;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "discount_type", length = 20)
+    private DiscountType discountType;
+
+    @Column(name = "discount_value", precision = 15, scale = 2)
+    private BigDecimal discountValue;
 
     @Column(name = "max_discount_amount", precision = 15, scale = 2)
     private BigDecimal maxDiscountAmount;
@@ -30,17 +37,38 @@ public class Promotion {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    public enum DiscountType {
+        PERCENT,  // Giảm theo phần trăm
+        FIXED     // Giảm trực tiếp (số tiền cố định)
+    }
+
     public boolean isValid() {
         return endDate == null || !LocalDate.now().isAfter(endDate);
     }
     
+    /**
+     * ===== STRATEGY PATTERN =====
+     * Sử dụng Strategy để tính discount - thay thế if-else
+     * Mỗi loại discountType sẽ sử dụng strategy tương ứng
+     */
     public BigDecimal calculateDiscount(BigDecimal baseAmount) {
-        if (!isValid() || discountPercent == null) return BigDecimal.ZERO;
-        
-        BigDecimal discount = baseAmount.multiply(discountPercent).divide(BigDecimal.valueOf(100));
-        if (maxDiscountAmount != null && discount.compareTo(maxDiscountAmount) > 0) {
-            return maxDiscountAmount;
+        if (!isValid() || discountValue == null || discountType == null) {
+            return BigDecimal.ZERO;
         }
-        return discount;
+        
+        if (baseAmount == null || baseAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        
+        // Áp dụng Strategy tương ứng với discountType
+        if (discountType == DiscountType.PERCENT) {
+            return new PercentDiscountStrategy()
+                    .calculateWithValue(discountValue, baseAmount, maxDiscountAmount);
+        } else if (discountType == DiscountType.FIXED) {
+            return new FixedDiscountStrategy()
+                    .calculateWithValue(discountValue, baseAmount, maxDiscountAmount);
+        }
+        
+        return BigDecimal.ZERO;
     }
 }

@@ -13,7 +13,6 @@ type ScheduleEvent = {
   startTime: string; // HH:mm:ss
   endTime: string; // HH:mm:ss
   roomName: string | null;
-  branchName: string | null;
   online: boolean;
   meetingLink: string | null;
 };
@@ -263,14 +262,6 @@ export default function TeacherScheduleWeekClientHover({
                               <div className="mt-2 space-y-1">
                                 <div className="flex items-center justify-between gap-2">
                                   <span className="text-xs font-bold text-slate-400">
-                                    Chi nhánh
-                                  </span>
-                                  <span className="text-xs font-medium text-slate-700 truncate">
-                                    {e.branchName ?? "—"}
-                                  </span>
-                                </div>
-                                <div className="flex items-center justify-between gap-2">
-                                  <span className="text-xs font-bold text-slate-400">
                                     Phòng
                                   </span>
                                   <span className="text-xs font-medium text-slate-700 truncate">
@@ -338,15 +329,6 @@ export default function TeacherScheduleWeekClientHover({
           <div className="mt-4 space-y-3">
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-bold text-slate-700">
-                  Chi nhánh
-                </span>
-                <span className="text-sm font-medium text-slate-600 text-right truncate">
-                  {selected.branchName ?? "—"}
-                </span>
-              </div>
-
-              <div className="mt-2 flex items-center justify-between gap-3">
                 <span className="text-sm font-bold text-slate-700">Phòng</span>
                 <span className="text-sm font-medium text-slate-600 text-right truncate">
                   {selected.roomName ??

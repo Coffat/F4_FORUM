@@ -15,6 +15,8 @@ import com.f4.forum.repository.ClassRepository;
 import com.f4.forum.repository.EnrollmentRepository;
 import com.f4.forum.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class StaffClassFacade {
 
     private final ClassRepository classRepository;
@@ -49,7 +52,9 @@ public class StaffClassFacade {
      * Lấy toàn bộ danh sách lớp học (không phân trang, dành cho Staff tổng quát).
      * Ánh xạ entity sang DTO để bảo vệ domain model.
      */
+    @Cacheable(value = "classes", key = "'all'", unless = "#result.isEmpty()")
     public List<ClassSummaryResponse> getAllClasses() {
+        log.debug("Fetching all classes from DB");
         List<ClassEntity> classes = classRepository.findAll();
         return classes.stream()
                 .map(this::toClassSummary)

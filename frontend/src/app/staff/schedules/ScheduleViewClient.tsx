@@ -40,8 +40,14 @@ export default function ScheduleViewClient() {
 
   const loadSchedules = async () => {
     setLoading(true);
-    const start = weekDays[0].toISOString().split('T')[0];
-    const end = weekDays[6].toISOString().split('T')[0];
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    const start = formatDate(weekDays[0]);
+    const end = formatDate(weekDays[6]);
     const res = await getSchedules(start, end);
     if (res.success) setSchedules(res.data);
     setLoading(false);
@@ -156,7 +162,10 @@ export default function ScheduleViewClient() {
 
               {/* Events for this day */}
               {schedules
-                .filter(s => s.date === day.toISOString().split('T')[0])
+                .filter(s => {
+                  const dayStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+                  return s.date === dayStr;
+                })
                 .map(schedule => {
                   const { top, height } = getPosition(schedule.startTime, schedule.endTime);
                   return (

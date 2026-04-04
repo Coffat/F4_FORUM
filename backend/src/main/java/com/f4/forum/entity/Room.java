@@ -16,11 +16,6 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id", nullable = false)
-    private Branch branch;
-
     @Column(nullable = false, length = 100)
     private String name;
 
@@ -28,11 +23,6 @@ public class Room {
 
     @Column(name = "room_type", length = 100)
     private String roomType;
-
-    // Package-private, only used by Branch to maintain bidirectional relationship
-    void assignToBranch(Branch branch) {
-        this.branch = branch;
-    }
     
     public boolean canAccommodate(int studentCount) {
         return capacity != null && capacity >= studentCount;

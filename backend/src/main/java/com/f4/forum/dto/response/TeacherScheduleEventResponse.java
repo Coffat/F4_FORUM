@@ -12,7 +12,6 @@ public record TeacherScheduleEventResponse(
         LocalTime startTime,
         LocalTime endTime,
         String roomName,
-        String branchName,
         Boolean online,
         String meetingLink
 ) {}

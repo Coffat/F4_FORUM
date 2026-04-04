@@ -49,7 +49,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()          // Auth (đăng nhập)
                 .requestMatchers("/api/v1/courses/**").permitAll()        // Courses (công khai)
-                .requestMatchers("/api/v1/branches/**").permitAll()       // Branches (công khai cho dev)
                 .requestMatchers("/api/v1/teachers/**").permitAll()       // Teacher Portal (mock token)
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
                 .requestMatchers("/api/admin/**").permitAll()             // Admin functionalities (Until JWT Filter is set up)
@@ -59,6 +58,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/staff/classes/**").permitAll()  // Staff Classes
                 .requestMatchers("/api/v1/staff/schedules/**").permitAll() // Staff Schedules
                 .requestMatchers("/api/v1/staff/rooms/**").permitAll()     // Staff Rooms
+                .requestMatchers("/api/v1/staff/invoices/**").permitAll()  // Staff Invoices
+                .requestMatchers("/api/v1/staff/promotions/**").permitAll()  // Staff Promotions
                 .anyRequest().authenticated()
             );
 

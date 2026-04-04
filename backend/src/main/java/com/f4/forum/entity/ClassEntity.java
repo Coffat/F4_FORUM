@@ -1,6 +1,7 @@
 package com.f4.forum.entity;
 
 import com.f4.forum.entity.enums.ClassStatus;
+import com.f4.forum.exception.BusinessRuleViolationException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -57,7 +58,6 @@ public class ClassEntity {
     @Version
     private Long version;
 
-    // Rich Domain Model
     public void addTeacher(Teacher teacher) {
         this.teachers.add(teacher);
     }
@@ -67,13 +67,32 @@ public class ClassEntity {
     }
 
     public void cancelClass() {
+        if (this.status == ClassStatus.CANCELLED) {
+            throw new BusinessRuleViolationException("Lớp học đã bị hủy trước đó!");
+        }
+        if (this.status == ClassStatus.CLOSED) {
+            throw new BusinessRuleViolationException("Không thể hủy lớp học đã đóng!");
+        }
         this.status = ClassStatus.CANCELLED;
     }
     
     public void startClass() {
+        if (this.status == ClassStatus.CANCELLED) {
+            throw new BusinessRuleViolationException("Không thể bắt đầu lớp học đã bị hủy!");
+        }
+        if (this.status == ClassStatus.IN_PROGRESS) {
+            throw new BusinessRuleViolationException("Lớp học đã đang diễn ra!");
+        }
         if (LocalDate.now().isBefore(startDate)) {
-            throw new IllegalStateException("Cannot start class before start date");
+            throw new BusinessRuleViolationException("Không thể bắt đầu lớp học trước ngày khai giảng!");
         }
         this.status = ClassStatus.IN_PROGRESS;
+    }
+
+    public void closeClass() {
+        if (this.status == ClassStatus.CANCELLED) {
+            throw new BusinessRuleViolationException("Không thể đóng lớp học đã bị hủy!");
+        }
+        this.status = ClassStatus.CLOSED;
     }
 }
