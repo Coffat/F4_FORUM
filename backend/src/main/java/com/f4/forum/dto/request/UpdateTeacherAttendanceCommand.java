@@ -1,17 +1,19 @@
 package com.f4.forum.dto.request;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
-/**
- * Command cập nhật điểm danh cho 1 buổi học.
- */
 public record UpdateTeacherAttendanceCommand(
-        List<Entry> entries
+    @NotNull(message = "Danh sách điểm danh không được để trống")
+    @Valid
+    List<Entry> entries
 ) {
     public record Entry(
-            Long enrollmentId,
-            Boolean isPresent,
-            String remarks
+        @NotNull(message = "Enrollment ID không được để trống")
+        Long enrollmentId,
+        Boolean isPresent,
+        String remarks
     ) {}
 }
-

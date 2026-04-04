@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -317,7 +318,7 @@ public class TeacherController {
     public ResponseEntity<?> saveAttendance(
             @PathVariable Long classId,
             @RequestParam("scheduleId") Long scheduleId,
-            @RequestBody UpdateTeacherAttendanceCommand command,
+            @Valid @RequestBody UpdateTeacherAttendanceCommand command,
             @RequestHeader(name = "Authorization", required = false) String authorizationHeader
     ) {
         try {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,10 +34,12 @@ export default function RootLayout({
       className={`${inter.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <ErrorBoundary>
           <QueryProvider>
-              {children}
-              <Toaster position="top-right" richColors closeButton />
+            {children}
+            <Toaster position="top-right" richColors closeButton />
           </QueryProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
