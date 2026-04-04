@@ -21,7 +21,7 @@ public class PayInvoiceCommandHandler extends AbstractCommand<InvoiceResponse> {
     }
     
     @Override
-    public InvoiceResponse execute() {
+    protected InvoiceResponse doExecute() {
         log.info("📨 [COMMAND] Executing PayInvoiceCommand: {} for invoice {}", 
                 getCommandId(), invoiceId);
         
@@ -29,5 +29,10 @@ public class PayInvoiceCommandHandler extends AbstractCommand<InvoiceResponse> {
         
         log.info("💰 [COMMAND] PayInvoiceCommand completed for invoice {}", invoiceId);
         return result;
+    }
+    
+    @Override
+    public String getCommandName() {
+        return "PayInvoiceCommandHandler";
     }
 }
