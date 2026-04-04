@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -29,9 +30,24 @@ public class Student extends User {
     @Column(name = "registration_date")
     private LocalDate registrationDate;
 
+    @Column(name = "target_score", precision = 5, scale = 2)
+    private BigDecimal targetScore;
+
     // Rich Domain Model
-    public void updateProfile(String address, String phone) {
+    public void updateAccountProfile(String address, String phone, String avatarUrl, LocalDate dob, String email) {
         this.address = address;
-        super.updateContact(phone, super.getEmail());
+        this.dateOfBirth = dob;
+        super.updatePersonalData(phone, avatarUrl, email);
+    }
+
+    /**
+     * Cập nhật mục tiêu điểm IELTS của học viên.
+     * Business Invariant: Điểm IELTS phải từ 0.0 đến 9.0.
+     */
+    public void updateTargetScore(BigDecimal targetScore) {
+        if (targetScore != null && (targetScore.compareTo(BigDecimal.ZERO) < 0 || targetScore.compareTo(new BigDecimal("9.0")) > 0)) {
+            throw new IllegalArgumentException("Điểm mục tiêu IELTS phải nằm trong khoảng [0.0 - 9.0]");
+        }
+        this.targetScore = targetScore;
     }
 }

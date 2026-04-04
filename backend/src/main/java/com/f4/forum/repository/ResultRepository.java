@@ -7,9 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ResultRepository extends JpaRepository<Result, Long> {
+
+    Optional<Result> findByEnrollmentId(Long enrollmentId);
 
     @Query("""
             SELECT r
@@ -19,4 +22,3 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
             """)
     List<Result> findByEnrollmentIds(@Param("enrollmentIds") List<Long> enrollmentIds);
 }
-

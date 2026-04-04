@@ -7,8 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
+    
+    @Query("SELECT s FROM Submission s JOIN FETCH s.assignment a WHERE s.student.id = :studentId AND a.classEntity.id = :classId")
+    List<Submission> findByStudentIdAndClassIdWithAssignment(@Param("studentId") Long studentId, @Param("classId") Long classId);
 
     @Query("""
             SELECT COUNT(s)
@@ -23,4 +28,3 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
             @Param("status") SubmissionStatus status
     );
 }
-

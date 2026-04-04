@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
+    List<Attendance> findByEnrollmentId(Long enrollmentId);
+
     @Query("""
             SELECT a
             FROM Attendance a

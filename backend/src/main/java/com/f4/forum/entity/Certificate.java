@@ -25,6 +25,11 @@ public class Certificate {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+    @Column(name = "certificate_type")
+    private String type;
+
+    private String score;
+
     @Column(name = "certificate_url", columnDefinition = "TEXT")
     private String certificateUrl;
 
