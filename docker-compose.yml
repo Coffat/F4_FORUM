@@ -20,6 +20,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      
+  redis:
+    image: redis:7.2-alpine
+    container_name: f4_forum_redis
+    ports:
+      - "6379:6379"
+    restart: always
 
   # Container phụ làm nhiệm vụ Watch sự thay đổi của file init.sql
   # Cơ chế: Sử dụng inotifywait để lắng nghe sự thay đổi trên init.sql.
