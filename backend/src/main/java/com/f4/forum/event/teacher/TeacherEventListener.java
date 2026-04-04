@@ -30,26 +30,6 @@ public class TeacherEventListener {
                 event.getAssignmentId(), event.getClassId(), event.getTeacherId());
     }
 
-    @Async
-    @EventListener
-    public void handleMaterialCreated(MaterialCreatedEvent event) {
-        log.info("📄 [Teacher Event] Material created: '{}' (ID: {}) in class {} by teacher {}",
-                event.getTitle(), event.getMaterialId(), event.getClassId(), event.getTeacherId());
-    }
-
-    @Async
-    @EventListener
-    public void handleMaterialUpdated(MaterialUpdatedEvent event) {
-        log.info("✏️ [Teacher Event] Material updated: '{}' (ID: {}) in class {} by teacher {}",
-                event.getTitle(), event.getMaterialId(), event.getClassId(), event.getTeacherId());
-    }
-
-    @Async
-    @EventListener
-    public void handleMaterialDeleted(MaterialDeletedEvent event) {
-        log.info("🗑️ [Teacher Event] Material deleted: ID {} in class {} by teacher {}",
-                event.getMaterialId(), event.getClassId(), event.getTeacherId());
-    }
 
     @Async
     @EventListener

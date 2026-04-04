@@ -6,8 +6,6 @@ import com.f4.forum.dto.request.CreateTeacherAssignmentCommand;
 import com.f4.forum.dto.request.UpdateTeacherAssignmentCommand;
 import com.f4.forum.dto.request.UpdateTeacherAttendanceCommand;
 import com.f4.forum.dto.request.UpdateTeacherGradesCommand;
-import com.f4.forum.dto.request.CreateTeacherMaterialCommand;
-import com.f4.forum.dto.request.UpdateTeacherMaterialCommand;
 import com.f4.forum.service.TeacherProfileFacade;
 import com.f4.forum.service.TeacherOverviewFacade;
 import com.f4.forum.service.TeacherClassesFacade;
@@ -15,7 +13,6 @@ import com.f4.forum.service.TeacherAssignmentFacade;
 import com.f4.forum.service.TeacherStudentFacade;
 import com.f4.forum.service.TeacherAttendanceFacade;
 import com.f4.forum.service.TeacherGradesFacade;
-import com.f4.forum.service.TeacherMaterialFacade;
 import com.f4.forum.service.TeacherScheduleFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -54,7 +51,6 @@ public class TeacherController {
     private final TeacherStudentFacade teacherStudentFacade;
     private final TeacherAttendanceFacade teacherAttendanceFacade;
     private final TeacherGradesFacade teacherGradesFacade;
-    private final TeacherMaterialFacade teacherMaterialFacade;
     private final TeacherScheduleFacade teacherScheduleFacade;
 
     @GetMapping("/me")
@@ -370,89 +366,6 @@ public class TeacherController {
         }
     }
 
-    @GetMapping("/classes/{classId}/materials")
-    @Operation(summary = "Lấy danh sách tài liệu của lớp")
-    public ResponseEntity<?> getClassMaterials(
-            @PathVariable Long classId,
-            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
-    ) {
-        try {
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
-            }
-            String token = authorizationHeader.substring("Bearer ".length()).trim();
-            return ResponseEntity.ok(teacherMaterialFacade.getMaterials(classId, token));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping(value = "/classes/{classId}/materials", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload tài liệu cho lớp", description = "Nhập tiêu đề, mô tả và file tài liệu (bắt buộc).")
-    public ResponseEntity<?> createMaterial(
-            @PathVariable Long classId,
-            @RequestParam("title") String title,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam("file") MultipartFile file,
-            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
-    ) {
-        try {
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
-            }
-            if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body("Vui lòng chọn file tài liệu để upload!");
-            }
-            String token = authorizationHeader.substring("Bearer ".length()).trim();
-            String originalFileName = file.getOriginalFilename();
-            CreateTeacherMaterialCommand command = new CreateTeacherMaterialCommand(title, description);
-            return ResponseEntity.ok(teacherMaterialFacade.createMaterial(classId, token, command, originalFileName));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PutMapping(value = "/classes/{classId}/materials/{materialId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Cập nhật tài liệu của lớp", description = "Sửa tiêu đề/mô tả và thay file (optional).")
-    public ResponseEntity<?> updateMaterial(
-            @PathVariable Long classId,
-            @PathVariable Long materialId,
-            @RequestParam("title") String title,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "file", required = false) MultipartFile file,
-            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
-    ) {
-        try {
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
-            }
-            String token = authorizationHeader.substring("Bearer ".length()).trim();
-            String originalFileName = (file == null || file.isEmpty()) ? null : file.getOriginalFilename();
-            UpdateTeacherMaterialCommand command = new UpdateTeacherMaterialCommand(title, description);
-            return ResponseEntity.ok(teacherMaterialFacade.updateMaterial(classId, materialId, token, command, originalFileName));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/classes/{classId}/materials/{materialId}")
-    @Operation(summary = "Xóa tài liệu của lớp")
-    public ResponseEntity<?> deleteMaterial(
-            @PathVariable Long classId,
-            @PathVariable Long materialId,
-            @RequestHeader(name = "Authorization", required = false) String authorizationHeader
-    ) {
-        try {
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                return ResponseEntity.badRequest().body("Thiếu Authorization Bearer token!");
-            }
-            String token = authorizationHeader.substring("Bearer ".length()).trim();
-            teacherMaterialFacade.deleteMaterial(classId, materialId, token);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
     @GetMapping("/me/schedule")
     @Operation(summary = "Lấy lịch dạy theo khoảng ngày")

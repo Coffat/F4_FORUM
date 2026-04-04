@@ -21,10 +21,6 @@ public class Material {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id")
-    private ClassEntity classEntity;
-
     @Column(nullable = false)
     private String title;
 

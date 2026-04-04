@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS classes;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS rooms;
 
+DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS staff_members;
 DROP TABLE IF EXISTS teachers;
 DROP TABLE IF EXISTS students;
@@ -54,7 +55,7 @@ CREATE TABLE users (
     avatar_url TEXT,
     email VARCHAR(255) UNIQUE,
     status VARCHAR(50) DEFAULT 'ACTIVE',
-    user_type ENUM('STUDENT', 'TEACHER', 'STAFF') NOT NULL,
+    user_type ENUM('STUDENT', 'TEACHER', 'STAFF', 'ADMIN') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -90,6 +91,11 @@ CREATE TABLE teachers (
 CREATE TABLE staff_members (
     user_id BIGINT PRIMARY KEY,
     department VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE admins (
+    user_id BIGINT PRIMARY KEY,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -171,7 +177,7 @@ CREATE TABLE attendances (
     schedule_id BIGINT NOT NULL,
     enrollment_id BIGINT NOT NULL,
     is_present BOOLEAN DEFAULT FALSE,
-    remarks TEXT,
+    note TEXT,
     UNIQUE KEY (schedule_id, enrollment_id),
     FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE,
     FOREIGN KEY (enrollment_id) REFERENCES enrollments(id) ON DELETE CASCADE
@@ -205,8 +211,7 @@ CREATE TABLE certificates (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     student_id BIGINT NOT NULL,
     course_id BIGINT NOT NULL,
-    certificate_type VARCHAR(100),
-    score VARCHAR(50),
+    name VARCHAR(255) NOT NULL, -- certificateName in diagram
     certificate_url TEXT,
     issue_date DATE,
     FOREIGN KEY (student_id) REFERENCES students(user_id) ON DELETE CASCADE,
@@ -216,15 +221,13 @@ CREATE TABLE certificates (
 -- --- LMS: LEARNING MANAGEMENT ---
 CREATE TABLE materials (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    course_id BIGINT,
-    class_id BIGINT,
+    course_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     material_type VARCHAR(50),
     file_url TEXT NOT NULL,
     upload_date DATE,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
-    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
 CREATE TABLE assignments (
@@ -260,7 +263,7 @@ CREATE TABLE submissions (
 CREATE TABLE promotions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     promo_code VARCHAR(50) UNIQUE NOT NULL,
-    discount_type VARCHAR(20),
+    type VARCHAR(20),
     discount_value DECIMAL(15, 2),
     max_discount_amount DECIMAL(15, 2),
     end_date DATE
@@ -328,6 +331,8 @@ VALUES (1, 'Quản trị viên Hệ thống', '0123456789', 'admin@f4forum.com',
 
 INSERT INTO staff_members (user_id, department)
 VALUES (1, 'IT Administration');
+INSERT INTO admins (user_id)
+VALUES (1);
 
 -- Mật khẩu "1" đã được mã hóa BCrypt chính xác
 INSERT INTO user_accounts (user_id, username, password_hash, role)
@@ -433,8 +438,8 @@ VALUES (6, '2003-05-15', 'MALE', 'Ho Chi Minh City, Vietnam', '2026-03-30', 7.5)
 INSERT INTO placement_tests (student_id, test_date, listening, speaking, reading, writing, overall, recommended_level)
 VALUES (6, '2026-03-25', 6.5, 7.0, 6.0, 6.5, 6.5, 'INTERMEDIATE');
 
-INSERT INTO certificates (student_id, course_id, certificate_type, score, certificate_url, issue_date)
-VALUES (6, 1, 'IELTS Academic', '6.5', 'https://example.com/cert/67890', '2025-12-20');
+INSERT INTO certificates (student_id, course_id, name, certificate_url, issue_date)
+VALUES (6, 1, 'IELTS Academic', 'https://example.com/cert/67890', '2025-12-20');
 
 INSERT INTO user_accounts (user_id, username, password_hash, role)
 VALUES (6, 'tai', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT');
@@ -459,7 +464,7 @@ INSERT INTO schedules (id, class_id, room_id, date, start_time, end_time, is_onl
 -- Đánh dấu điểm danh cho Tai tại buổi học đầu tiên (test UI)
 -- Tìm enrollment_id của Tai trong lớp 1 (Thường là 1 nếu là record đầu tiên)
 -- Tuy nhiên để an toàn thì dùng subquery hoặc hardcode 1 nếu chắc chắn
-INSERT INTO attendances (schedule_id, enrollment_id, is_present, remarks) VALUES
+INSERT INTO attendances (schedule_id, enrollment_id, is_present, note) VALUES
 (1, 1, TRUE, 'Học viên đi đúng giờ, tích cực phát biểu');
 
 -- ── Tài khoản Staff & Teacher Test (Mật khẩu: "1") ──────────────────────
@@ -516,7 +521,7 @@ INSERT INTO enrollments (id, student_id, class_id, enrollment_date, status) VALU
 (11, 10, 9, '2026-03-26', 'ENROLLED');
 
 -- ── Attendance mẫu cho buổi đầu tiên ──────────────────────────────────
-INSERT INTO attendances (id, schedule_id, enrollment_id, is_present, remarks) VALUES
+INSERT INTO attendances (id, schedule_id, enrollment_id, is_present, note) VALUES
 (10, 10, 10, TRUE,  'Đúng giờ'),
 (11, 10, 11, FALSE, 'Vắng (demo)');
 
