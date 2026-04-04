@@ -465,3 +465,20 @@ VALUES
 (6, 1, '2026-03-30', 'ENROLLED'), -- IELTS Foundation
 (6, 4, '2026-03-30', 'ENROLLED'); -- IELTS Intermediate
 
+-- SEED DATA cho Schedules (Một số buổi học trong tháng 04/2026)
+INSERT INTO schedules (id, class_id, room_id, date, start_time, end_time, is_online, meeting_link) VALUES
+-- Lớp Foundation (Thứ 3, 5, 7)
+(1, 1, 1, '2026-04-07', '08:00:00', '10:30:00', FALSE, NULL),
+(2, 1, 1, '2026-04-09', '08:00:00', '10:30:00', FALSE, NULL),
+(3, 1, 1, '2026-04-11', '08:00:00', '10:30:00', FALSE, NULL),
+-- Lớp Intermediate (Thứ 2, 4, 6) - Online
+(4, 4, 2, '2026-04-13', '18:30:00', '21:00:00', TRUE, 'https://meet.google.com/abc-defg-hij'),
+(5, 4, 2, '2026-04-15', '18:30:00', '21:00:00', TRUE, 'https://meet.google.com/abc-defg-hij'),
+(6, 4, 2, '2026-04-17', '18:30:00', '21:00:00', TRUE, 'https://meet.google.com/abc-defg-hij');
+
+-- Đánh dấu điểm danh cho Tai tại buổi học đầu tiên (test UI)
+-- Tìm enrollment_id của Tai trong lớp 1 (Thường là 1 nếu là record đầu tiên)
+-- Tuy nhiên để an toàn thì dùng subquery hoặc hardcode 1 nếu chắc chắn
+INSERT INTO attendances (schedule_id, enrollment_id, is_present, remarks) VALUES
+(1, 1, TRUE, 'Học viên đi đúng giờ, tích cực phát biểu');
+

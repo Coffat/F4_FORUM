@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     "F4 Forum is a premium English center for elite learners. Fast, Focus, Future, Foundation.",
 };
 
+import QueryProvider from "@/components/providers/QueryProvider";
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +32,12 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${outfit.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+          <QueryProvider>
+              {children}
+              <Toaster position="top-right" richColors closeButton />
+          </QueryProvider>
+      </body>
     </html>
   );
 }

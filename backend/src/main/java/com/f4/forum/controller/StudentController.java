@@ -26,6 +26,7 @@ public class StudentController {
 
     private final StudentQueryService studentQueryService;
     private final StudentCommandService studentCommandService;
+    private final com.f4.forum.service.query.ScheduleQueryService scheduleQueryService;
 
     /**
      * Endpoint lấy dữ liệu Dashboard cho Student.
@@ -35,7 +36,7 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Lấy dữ liệu Dashboard cho học viên", 
                description = "API này trả về thông tin cá nhân và danh sách các lớp học mà học viên đang đăng ký.")
-    public StudentDashboardResponse getDashboard(Authentication authentication) {
+    public StudentDashboardResponse getDashboard(org.springframework.security.core.Authentication authentication) {
         // authentication.getName() sẽ trả về username (mã định danh duy nhất) trong JWT Token
         String currentUsername = authentication.getName();
         return studentQueryService.getStudentDashboardByUsername(currentUsername);
@@ -49,9 +50,26 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Lấy hồ sơ chi tiết của học viên", 
                description = "API này trả về thông tin cá nhân, mục tiêu học tập, điểm đầu vào và các chứng chỉ của học viên.")
-    public StudentProfileResponse getProfile(Authentication authentication) {
+    public StudentProfileResponse getProfile(org.springframework.security.core.Authentication authentication) {
         String currentUsername = authentication.getName();
         return studentQueryService.getStudentProfileByUsername(currentUsername);
+    }
+
+    /**
+     * Endpoint lấy lịch học cá nhân.
+     * Lộ trình: /api/v1/student/me/schedules
+     */
+    @GetMapping("/me/schedules")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Lấy lịch học cá nhân", 
+               description = "Trả về danh sách các buổi học trong tuần cho học viên đang đăng nhập.")
+    public java.util.List<com.f4.forum.dto.response.ScheduleDTO> getMyWeeklySchedules(
+            org.springframework.security.core.Authentication authentication,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate
+    ) {
+        String currentUsername = authentication.getName();
+        return scheduleQueryService.getWeeklySchedulesByUsername(currentUsername, startDate, endDate).join();
     }
 
     /**
@@ -62,7 +80,7 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Cập nhật hồ sơ cá nhân", 
                description = "Cho phép học viên tự cập nhật Số điện thoại, Ngày sinh, Avatar và Điểm mục tiêu.")
-    public ResponseEntity<String> updateProfile(Authentication authentication, 
+    public ResponseEntity<String> updateProfile(org.springframework.security.core.Authentication authentication, 
                               @Valid @RequestBody UpdateStudentProfileCommand command) {
         String currentUsername = authentication.getName();
         studentCommandService.updateProfileByUsername(currentUsername, command);
