@@ -43,7 +43,14 @@ public class UserFactory {
                     .userType(cmd.userType())
                     .department(cmd.department())
                     .build();
-            default -> throw new IllegalArgumentException("Unsupported UserType");
+            case ADMIN -> com.f4.forum.entity.Admin.builder()
+                    .fullName(cmd.fullName())
+                    .email(cmd.email())
+                    .phone(cmd.phone())
+                    .status(UserStatus.ACTIVE)
+                    .userType(cmd.userType())
+                    .build();
+            default -> throw new IllegalArgumentException("Unsupported UserType: " + cmd.userType());
         };
     }
 }

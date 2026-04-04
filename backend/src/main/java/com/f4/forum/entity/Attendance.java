@@ -29,17 +29,17 @@ public class Attendance {
     @Column(name = "is_present")
     private Boolean isPresent;
 
-    @Column(columnDefinition = "TEXT")
-    private String remarks;
+    @Column(name = "note", columnDefinition = "TEXT")
+    private String note;
 
     // Rich Domain Model
-    public void markPresent(String remarks) {
+    public void markPresent(String note) {
         this.isPresent = true;
-        this.remarks = remarks;
+        this.note = note;
     }
 
-    public void markAbsent(String remarks) {
+    public void markAbsent(String note) {
         this.isPresent = false;
-        this.remarks = remarks;
+        this.note = note;
     }
 }

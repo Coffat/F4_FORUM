@@ -65,9 +65,9 @@ export default function StudentAcademicResultsClient({ initialData }: Props) {
                 </CardTitle>
                 <CardDescription>Biểu đồ phân tích độ bao phủ các kỹ năng</CardDescription>
               </CardHeader>
-              <CardContent className="h-[350px]">
+              <CardContent className="h-[350px] w-full min-w-0">
                 {latestPlacementTest ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={placementChartData}>
                       <PolarGrid />
                       <PolarAngleAxis dataKey="subject" className="text-sm font-bold text-slate-600" />
@@ -106,8 +106,7 @@ export default function StudentAcademicResultsClient({ initialData }: Props) {
                         <div className="absolute -right-4 -bottom-4 text-emerald-500/10 group-hover:scale-110 transition-transform">
                           <Medal className="w-24 h-24" />
                         </div>
-                        <h4 className="font-extrabold text-emerald-900 mb-1">{cert.type}</h4>
-                        <div className="text-sn text-emerald-700 font-bold mb-3 border-b border-emerald-200/50 pb-2 inline-block">Score: {cert.score}</div>
+                        <h4 className="font-extrabold text-emerald-900 mb-1">{cert.name}</h4>
                         <p className="text-xs text-slate-500">Cấp ngày: {new Date(cert.issueDate).toLocaleDateString("vi-VN")}</p>
                       </motion.div>
                     ))}

@@ -113,9 +113,8 @@ public class StudentQueryService {
         List<CertificateDTO> certificates = certificateRepository.findByStudentId(studentId)
             .stream()
             .map(c -> new CertificateDTO(
-                c.getType(),
+                c.getName(),
                 c.getIssueDate(),
-                c.getScore(),
                 c.getCertificateUrl()
             ))
             .collect(Collectors.toList());

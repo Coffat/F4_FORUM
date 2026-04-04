@@ -6,6 +6,6 @@ public record TeacherAttendanceStudentResponse(
         String studentName,
         String enrollmentStatus,
         boolean present,
-        String remarks
+        String note
 ) {}
 

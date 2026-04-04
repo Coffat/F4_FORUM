@@ -25,7 +25,7 @@ public class Promotion {
     private String promoCode;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "discount_type", length = 20)
+    @Column(name = "type", length = 20)
     private DiscountType discountType;
 
     @Column(name = "discount_value", precision = 15, scale = 2)

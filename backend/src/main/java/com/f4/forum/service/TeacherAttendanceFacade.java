@@ -75,7 +75,7 @@ public class TeacherAttendanceFacade {
                             e.getStudent().getFullName(),
                             e.getStatus().name(),
                             attendance != null && Boolean.TRUE.equals(attendance.getIsPresent()),
-                            attendance != null ? attendance.getRemarks() : null
+                            attendance != null ? attendance.getNote() : null
                     );
                 })
                 .toList();
@@ -112,7 +112,7 @@ public class TeacherAttendanceFacade {
                 continue;
             }
             boolean present = Boolean.TRUE.equals(entry.isPresent());
-            String remarks = entry.remarks();
+            String note = entry.note();
 
             Attendance attendance = existingByEnrollmentId.get(entry.enrollmentId());
             if (attendance == null) {
@@ -125,9 +125,9 @@ public class TeacherAttendanceFacade {
             }
 
             if (present) {
-                attendance.markPresent(remarks);
+                attendance.markPresent(note);
             } else {
-                attendance.markAbsent(remarks);
+                attendance.markAbsent(note);
             }
             toSave.add(attendance);
         }

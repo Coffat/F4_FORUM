@@ -11,7 +11,7 @@ public record UpdateTeacherAttendanceCommand(
     public record Entry(
             Long enrollmentId,
             Boolean isPresent,
-            String remarks
+            String note
     ) {}
 }
 
