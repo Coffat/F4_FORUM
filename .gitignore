@@ -1,6 +1,7 @@
 # Misc
 .DS_Store
 *.pem
+.opencode
 
 # Frontend
 frontend/node_modules

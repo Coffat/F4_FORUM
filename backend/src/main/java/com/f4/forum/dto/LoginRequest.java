@@ -1,2 +1,10 @@
 package com.f4.forum.dto;
-public record LoginRequest(String username, String password) {}
+
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginRequest(
+    @NotBlank(message = "Username không được để trống")
+    String username,
+    @NotBlank(message = "Mật khẩu không được để trống")
+    String password
+) {}

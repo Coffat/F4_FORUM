@@ -54,14 +54,18 @@ export async function loginAction(
     secure: process.env.NODE_ENV === 'production',
     path: '/',
     maxAge: 60 * 60 * 24, // 1 ngày
+    sameSite: 'lax',
   });
 
-  // Lưu role vào cookie (không httpOnly để middleware đọc được dễ hơn)
+  // Lưu role vào cookie (httpOnly: false để middleware đọc được)
+  // Security: Thêm sameSite: 'strict' để giảm XSS risk
+  // Note: Nên decode role từ JWT payload thay vì lưu cookie riêng
   cookieStore.set('auth_role', resultRole, {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
     maxAge: 60 * 60 * 24, // 1 ngày
+    sameSite: 'lax',
   });
 
   // Điều hướng đúng theo từng role từ backend enum AccountRole

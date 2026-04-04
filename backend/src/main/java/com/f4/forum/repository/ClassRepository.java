@@ -51,4 +51,11 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
             @Param("teacherId") Long teacherId,
             @Param("statuses") java.util.List<ClassStatus> statuses
     );
+
+    @EntityGraph(attributePaths = {"course", "defaultRoom", "teachers"})
+    @Query("SELECT c FROM ClassEntity c JOIN c.teachers t WHERE t.id = :teacherId AND c.status IN :statuses")
+    List<ClassEntity> findByTeacherIdAndStatusIn(
+            @Param("teacherId") Long teacherId,
+            @Param("statuses") List<ClassStatus> statuses
+    );
 }

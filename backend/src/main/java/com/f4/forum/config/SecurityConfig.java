@@ -1,7 +1,8 @@
 package com.f4.forum.config;
 
 import com.f4.forum.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,11 +24,17 @@ import java.util.List;
  * Tích hợp Filter giải mã JWT và quản lý phân quyền Endpoint.
  */
 @Configuration
-@RequiredArgsConstructor
 @EnableMethodSecurity // Kích hoạt @PreAuthorize("hasRole(...)")
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, RateLimitFilter rateLimitFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.rateLimitFilter = rateLimitFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -51,7 +58,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println(">>> Security Architecture: ACTIVE with JWT Filter");
+        log.info("Security Architecture: ACTIVE with JWT Filter");
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -77,8 +84,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/staff/invoices/**").permitAll()
                 .requestMatchers("/api/v1/staff/promotions/**").permitAll()
                 .anyRequest().authenticated()
-            )
-            // Kích hoạt JWT Filter trước các Filter mặc định của Spring
+            );
+        // Kích hoạt JWT Filter trước các Filter mặc định của Spring
+        // Rate limit filter chạy trước để block request quá nhanh
+        http.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
