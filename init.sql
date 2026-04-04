@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS classes;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS rooms;
 
+DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS staff_members;
 DROP TABLE IF EXISTS teachers;
 DROP TABLE IF EXISTS students;
@@ -51,7 +52,7 @@ CREATE TABLE users (
     phone VARCHAR(20),
     email VARCHAR(255) UNIQUE,
     status VARCHAR(50) DEFAULT 'ACTIVE',
-    user_type ENUM('STUDENT', 'TEACHER', 'STAFF') NOT NULL,
+    user_type ENUM('STUDENT', 'TEACHER', 'STAFF', 'ADMIN') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -86,6 +87,11 @@ CREATE TABLE teachers (
 CREATE TABLE staff_members (
     user_id BIGINT PRIMARY KEY,
     department VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE admins (
+    user_id BIGINT PRIMARY KEY,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -197,6 +203,7 @@ CREATE TABLE certificates (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     student_id BIGINT NOT NULL,
     course_id BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL, -- certificateName in diagram
     certificate_url TEXT,
     issue_date DATE,
     FOREIGN KEY (student_id) REFERENCES students(user_id) ON DELETE CASCADE,
@@ -206,15 +213,13 @@ CREATE TABLE certificates (
 -- --- LMS: LEARNING MANAGEMENT ---
 CREATE TABLE materials (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    course_id BIGINT,
-    class_id BIGINT,
+    course_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     material_type VARCHAR(50),
     file_url TEXT NOT NULL,
     upload_date DATE,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
-    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
 CREATE TABLE assignments (
@@ -318,6 +323,9 @@ VALUES (1, 'Quản trị viên Hệ thống', '0123456789', 'admin@f4forum.com',
 
 INSERT INTO staff_members (user_id, department)
 VALUES (1, 'IT Administration');
+
+INSERT INTO admins (user_id)
+VALUES (1);
 
 -- Mật khẩu "1" đã được mã hóa BCrypt chính xác
 INSERT INTO user_accounts (user_id, username, password_hash, role)
