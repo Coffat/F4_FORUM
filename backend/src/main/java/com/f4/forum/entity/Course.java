@@ -1,6 +1,7 @@
 package com.f4.forum.entity;
 
 import com.f4.forum.entity.enums.CourseStatus;
+import com.f4.forum.exception.BusinessRuleViolationException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -55,7 +56,11 @@ public class Course {
     @Version
     private Long version;
 
-    // Rich Domain Model
+    // Public setter for State Pattern
+    public void setStatus(CourseStatus status) {
+        this.status = status;
+    }
+
     public void updateFee(BigDecimal newFee) {
         if (newFee.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Fee cannot be negative");
@@ -70,7 +75,7 @@ public class Course {
         this.description = description;
         this.category = category;
         this.level = level;
-        this.updateFee(fee); // validates fee internally
+        this.updateFee(fee);
         this.maxEnrollment = maxEnrollment;
         this.imageUrl = imageUrl;
         this.imageColor = imageColor;
@@ -79,12 +84,27 @@ public class Course {
 
     public void publish() {
         if (this.status == CourseStatus.ARCHIVED) {
-            throw new IllegalStateException("Cannot publish an archived course");
+            throw new BusinessRuleViolationException("Không thể xuất bản khóa học đã bị lưu trữ!");
         }
         this.status = CourseStatus.PUBLISHED;
     }
 
+    public void updateDetailsByStaff(String name, String description, String category, String level, 
+                                     Integer maxEnrollment, String imageUrl, String imageColor, CourseStatus status) {
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.level = level;
+        this.maxEnrollment = maxEnrollment;
+        this.imageUrl = imageUrl;
+        this.imageColor = imageColor;
+        this.status = status;
+    }
+
     public void archive() {
+        if (this.status == CourseStatus.ARCHIVED) {
+            throw new BusinessRuleViolationException("Khóa học đã được lưu trữ trước đó!");
+        }
         this.status = CourseStatus.ARCHIVED;
     }
 }

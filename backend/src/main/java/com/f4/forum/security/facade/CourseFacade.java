@@ -3,7 +3,7 @@ package com.f4.forum.security.facade;
 import com.f4.forum.dto.CourseDTO;
 import com.f4.forum.mapper.CourseMapper;
 import com.f4.forum.service.CourseService;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * Facade Pattern: Điểm chạm duy nhất cho Module Course (Skill #3.4)
  * Giúp Controller không cần biết logic phức tạp bên trong các Service.
  */
-@Component
+@Service
 public class CourseFacade {
 
     private final CourseService courseService;

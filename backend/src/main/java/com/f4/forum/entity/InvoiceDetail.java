@@ -23,21 +23,21 @@ public class InvoiceDetail {
     private Invoice invoice;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "enrollment_id", nullable = false)
-    private Enrollment enrollment;
+    @JoinColumn(name = "course_id", nullable = true)
+    private Course course;
 
     private String description;
 
-    @Column(name = "unit_price", nullable = false, precision = 15, scale = 2)
     @Builder.Default
+    @Column(name = "unit_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal unitPrice = BigDecimal.ZERO;
 
-    @Column(name = "discount_amount", precision = 15, scale = 2)
     @Builder.Default
+    @Column(name = "discount_amount", precision = 15, scale = 2)
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
-    @Column(name = "final_price", nullable = false, precision = 15, scale = 2)
     @Builder.Default
+    @Column(name = "final_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal finalPrice = BigDecimal.ZERO;
 
     // Package-private
@@ -45,9 +45,8 @@ public class InvoiceDetail {
         this.invoice = invoice;
     }
 
-    @PrePersist
-    @PreUpdate
-    private void calculateFinalPrice() {
+    // Public method cho Rich Domain Model - Tell, Don't Ask
+    public void calculateFinalPrice() {
         if (discountAmount == null) discountAmount = BigDecimal.ZERO;
         this.finalPrice = this.unitPrice.subtract(this.discountAmount);
         if (this.finalPrice.compareTo(BigDecimal.ZERO) < 0) {

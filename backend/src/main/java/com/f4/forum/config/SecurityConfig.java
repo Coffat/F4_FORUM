@@ -59,14 +59,23 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()           // Login/Auth
-                .requestMatchers("/api/v1/student/**").hasRole("STUDENT") // Bảo vệ module học viên (PHẢI LÀ STUDENT)
-                .requestMatchers("/api/v1/courses/**").permitAll()         // Courses công khai
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/student/**").hasRole("STUDENT") 
+                .requestMatchers("/api/v1/courses/**").permitAll()
+                .requestMatchers("/api/v1/teachers/**").permitAll()
                 .requestMatchers("/api/v1/branches/**").permitAll()
                 .requestMatchers("/api/v1/rooms/**").permitAll()
                 .requestMatchers("/api/v1/classes/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/api/v1/staff-dashboard/**").permitAll()  // Vẫn để permitAll cho tính tương thích cũ
+                .requestMatchers("/api/admin/**").permitAll()
+                .requestMatchers("/api/v1/personnel/**").permitAll()
+                .requestMatchers("/api/v1/staff-dashboard/**").permitAll()
+                .requestMatchers("/api/v1/staff/courses/**").permitAll()
+                .requestMatchers("/api/v1/staff/classes/**").permitAll()
+                .requestMatchers("/api/v1/staff/schedules/**").permitAll()
+                .requestMatchers("/api/v1/staff/rooms/**").permitAll()
+                .requestMatchers("/api/v1/staff/invoices/**").permitAll()
+                .requestMatchers("/api/v1/staff/promotions/**").permitAll()
                 .anyRequest().authenticated()
             )
             // Kích hoạt JWT Filter trước các Filter mặc định của Spring

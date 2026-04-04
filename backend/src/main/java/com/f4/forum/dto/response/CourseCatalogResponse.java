@@ -22,4 +22,5 @@ public class CourseCatalogResponse {
     private CourseStatus status;
     private String imageUrl;
     private String imageColor;
+    private String level;
 }

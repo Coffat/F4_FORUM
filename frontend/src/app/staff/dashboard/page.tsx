@@ -1,5 +1,6 @@
-import StaffDashboardClient from "@/app/admin/staff/dashboard/StaffDashboardClient";
-import type { StaffDashboardMetrics } from "@/app/admin/staff/dashboard/page";
+import StaffDashboardClient, {
+  type StaffDashboardMetrics,
+} from "./StaffDashboardClient";
 
 const BE_METRICS_URL = "http://localhost:8080/api/v1/staff-dashboard/metrics";
 

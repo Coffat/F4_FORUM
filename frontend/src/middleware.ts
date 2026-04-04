@@ -51,6 +51,21 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // ── Bảo vệ route /teacher/* ──────────────────────────────────────
+  if (pathname.startsWith('/teacher')) {
+    // Chưa đăng nhập → về login
+    if (!token) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Đã đăng nhập nhưng không phải TEACHER hoặc ADMIN → unauthorized
+    if (role !== 'ROLE_TEACHER' && role !== 'ROLE_ADMIN') {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -59,5 +74,5 @@ export function middleware(request: NextRequest) {
  * Không chạy trên static files, _next, favicon...
  */
 export const config = {
-  matcher: ['/admin/:path*', '/staff/:path*', '/student/:path*'],
+  matcher: ['/admin/:path*', '/staff/:path*', '/student/:path*', '/teacher/:path*'],
 };

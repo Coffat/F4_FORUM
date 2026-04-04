@@ -3,10 +3,13 @@ spring:
     name: F4 Forum Backend
 
   datasource:
-    url: jdbc:mysql://localhost:3306/f4_forum?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3307/f4_forum?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
 
   # Sử dụng Virtual Threads (Java 21) cho hiệu năng cực cao - Skill #1
   threads:
@@ -22,6 +25,20 @@ spring:
     # Sử dụng none/validate vì Database schema đã được init.sql quản lý hoàn toàn!
     hibernate:
       ddl-auto: none
+
+  # Redis Configuration for Caching - Proxy Pattern #6
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+      cache-null-values: false
+    cache-names: courses,classes,rooms,schedules,promotions,users
 
 server:
   port: 8080

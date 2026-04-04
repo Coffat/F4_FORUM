@@ -8,7 +8,6 @@ import {
   Users,
   Briefcase,
   BookOpen,
-  MapPin,
   Plus,
   Settings,
   LogOut,
@@ -22,10 +21,8 @@ import Image from "next/image";
 
 const SIDEBAR_LINKS = [
   { name: "DASHBOARD", icon: LayoutDashboard, href: "/admin" },
-  { name: "STAFF DASHBOARD", icon: Activity, href: "/admin/staff/dashboard" },
   { name: "USERS", icon: Users, href: "/admin/users" },
   { name: "STAFF", icon: Briefcase, href: "/admin/staff" },
-  { name: "BRANCHES", icon: MapPin, href: "/admin/branches" },
   { name: "COURSES", icon: BookOpen, href: "/admin/courses" },
   { name: "CLASSES", icon: GraduationCap, href: "/admin/classes" },
 ];

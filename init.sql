@@ -29,7 +29,6 @@ DROP TABLE IF EXISTS class_teachers;
 DROP TABLE IF EXISTS classes;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS rooms;
-DROP TABLE IF EXISTS branches;
 
 DROP TABLE IF EXISTS staff_members;
 DROP TABLE IF EXISTS teachers;
@@ -95,26 +94,11 @@ CREATE TABLE staff_members (
 );
 
 -- --- INFRA & CATALOG ---
-CREATE TABLE branches (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    address TEXT,
-    phone VARCHAR(20),
-    manager_id BIGINT,
-    capacity INT DEFAULT 500,
-    current_enrollment INT DEFAULT 0,
-    status VARCHAR(20) DEFAULT 'ACTIVE',
-    version BIGINT DEFAULT 0,
-    FOREIGN KEY (manager_id) REFERENCES users(id)
-);
-
 CREATE TABLE rooms (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    branch_id BIGINT NOT NULL,
     name VARCHAR(100) NOT NULL,
     capacity INT,
-    room_type VARCHAR(100),
-    FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE
+    room_type VARCHAR(100)
 );
 
 CREATE TABLE courses (
@@ -235,6 +219,7 @@ CREATE TABLE materials (
     course_id BIGINT,
     class_id BIGINT,
     title VARCHAR(255) NOT NULL,
+    description TEXT,
     material_type VARCHAR(50),
     file_url TEXT NOT NULL,
     upload_date DATE,
@@ -275,7 +260,8 @@ CREATE TABLE submissions (
 CREATE TABLE promotions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     promo_code VARCHAR(50) UNIQUE NOT NULL,
-    discount_percent DECIMAL(5, 2),
+    discount_type VARCHAR(20),
+    discount_value DECIMAL(15, 2),
     max_discount_amount DECIMAL(15, 2),
     end_date DATE
 );
@@ -294,13 +280,13 @@ CREATE TABLE invoices (
 CREATE TABLE invoice_details (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     invoice_id BIGINT NOT NULL,
-    enrollment_id BIGINT NOT NULL,
+    course_id BIGINT,
     description VARCHAR(255),
     unit_price DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
     discount_amount DECIMAL(15, 2) DEFAULT 0.00,
     final_price DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
     FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
-    FOREIGN KEY (enrollment_id) REFERENCES enrollments(id) ON DELETE RESTRICT
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL
 );
 
 CREATE TABLE invoice_promotions (
@@ -361,20 +347,14 @@ INSERT INTO teachers (user_id, specialty, hire_date) VALUES
 (4, 'Academic Writing, IELTS Writing – Band 8.5', '2021-06-01'),
 (5, 'IELTS Expert, Speaking Coach – Band 9.0',     '2018-01-10');
 
--- ── Chi Nhánh ─────────────────────────────────────────────────────────
-INSERT INTO branches (id, name, address, phone, manager_id, capacity, current_enrollment, status) VALUES
-(1, 'Saigon Central',  'District 1, HCM City', '028-3911-2222', 2, 450, 385, 'ACTIVE'),
-(2, 'Hanoi West',       'Cau Giay, Hanoi', '024-3927-4455', 4, 300, 120, 'MAINTENANCE'),
-(3, 'Da Nang Coast',    'Ngu Hanh Son, Da Nang', '0511-3822-333', 1, 250, 210, 'ACTIVE');
-
 -- ── Phòng Học ─────────────────────────────────────────────────────────
-INSERT INTO rooms (id, branch_id, name, capacity, room_type) VALUES
-(1, 1, 'Phòng 101 – Lớp Nhỏ',     15, 'CLASSROOM'),
-(2, 1, 'Phòng 201 – Lớp Trung',   25, 'CLASSROOM'),
-(3, 1, 'Phòng 301 – Hội Thảo',    40, 'SEMINAR'),
-(4, 1, 'Phòng 401 – Speaking Lab', 12, 'LAB'),
-(5, 2, 'Phòng A01 – Lớp Nhỏ',     15, 'CLASSROOM'),
-(6, 2, 'Phòng A02 – Lớp Trung',   25, 'CLASSROOM');
+INSERT INTO rooms (id, name, capacity, room_type) VALUES
+(1, 'Phòng 101 – Lớp Nhỏ',     15, 'CLASSROOM'),
+(2, 'Phòng 201 – Lớp Trung',   25, 'CLASSROOM'),
+(3, 'Phòng 301 – Hội Thảo',    40, 'SEMINAR'),
+(4, 'Phòng 401 – Speaking Lab', 12, 'LAB'),
+(5, 'Phòng A01 – Lớp Nhỏ',     15, 'CLASSROOM'),
+(6, 'Phòng A02 – Lớp Trung',   25, 'CLASSROOM');
 
 -- ── Khóa Học IELTS (8 level – từ căn bản đến Band 8.0+) ──────────────
 INSERT INTO courses (id, code, name, description, level, fee) VALUES
@@ -481,4 +461,73 @@ INSERT INTO schedules (id, class_id, room_id, date, start_time, end_time, is_onl
 -- Tuy nhiên để an toàn thì dùng subquery hoặc hardcode 1 nếu chắc chắn
 INSERT INTO attendances (schedule_id, enrollment_id, is_present, remarks) VALUES
 (1, 1, TRUE, 'Học viên đi đúng giờ, tích cực phát biểu');
+
+-- ── Tài khoản Staff & Teacher Test (Mật khẩu: "1") ──────────────────────
+INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
+(7, 'Nhân viên Vận hành', '0999888777', 'staff@f4forum.com', 'ACTIVE', 'STAFF'),
+(8, 'Giảng viên Demo', '0888777666', 'teacher@f4forum.com', 'ACTIVE', 'TEACHER');
+
+INSERT INTO staff_members (user_id, department) VALUES (7, 'Operations');
+INSERT INTO teachers (user_id, specialty, hire_date) VALUES (8, 'IELTS Specialist', '2024-01-01');
+
+INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
+(7, 'staff', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STAFF'),
+(8, 'teacher', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_TEACHER');
+
+
+-- ==========================================
+-- 5. TEACHER DEMO DATA (Teacher Portal)
+-- Seed dữ liệu mẫu cho teacher user_id = 7 để hiển thị được:
+-- - Lớp đang dạy
+-- - Buổi dạy trong tuần (schedules)
+-- - Bài tập chờ chấm (submissions)
+-- ==========================================
+
+-- ── Students Demo (để có enrollment/submission) ───────────────────────
+INSERT INTO users (id, full_name, phone, email, status, user_type) VALUES
+(9, 'Học viên Demo A', '0901000001', 'student.a@f4forum.com', 'ACTIVE', 'STUDENT'),
+(10, 'Học viên Demo B', '0901000002', 'student.b@f4forum.com', 'ACTIVE', 'STUDENT');
+
+INSERT INTO students (user_id, date_of_birth, gender, address, registration_date) VALUES
+(9, '2006-05-10', 'Nam', 'Q1, HCM', '2026-03-01'),
+(10, '2007-02-20', 'Nữ', 'Q3, HCM', '2026-03-05');
+
+-- Tài khoản demo cho học viên (mật khẩu: "1")
+INSERT INTO user_accounts (user_id, username, password_hash, role) VALUES
+(9, 'student_a', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT'),
+(10, 'student_b', '$2a$10$xcYRr1tTzyhc12N/wy9S3us65L2Yy0.3YuzDWsqbFcJsqGHJsQ5hC', 'ROLE_STUDENT');
+
+-- ── Class demo do teacher (id=7) phụ trách ────────────────────────────
+INSERT INTO classes (id, course_id, default_room_id, class_code, start_date, end_date, max_students, status) VALUES
+(9, 1, 1, 'TEA-2026-01', '2026-03-25', '2026-06-30', 15, 'OPEN');
+
+INSERT INTO class_teachers (class_id, teacher_id) VALUES
+(9, 8); -- Teacher Demo (user_id=8)
+
+-- ── Schedule tuần hiện tại (để "buổi dạy tuần này" có data) ───────────
+INSERT INTO schedules (id, class_id, room_id, date, start_time, end_time, is_online, meeting_link) VALUES
+(10, 9, 1, '2026-03-30', '18:00:00', '20:00:00', FALSE, NULL),
+(11, 9, 1, '2026-04-01', '18:00:00', '20:00:00', FALSE, NULL),
+(12, 9, 1, '2026-04-03', '18:00:00', '20:00:00', FALSE, NULL);
+
+-- ── Enrollments (gắn học viên vào lớp) ────────────────────────────────
+INSERT INTO enrollments (id, student_id, class_id, enrollment_date, status) VALUES
+(10, 9, 9, '2026-03-26', 'ENROLLED'),
+(11, 10, 9, '2026-03-26', 'ENROLLED');
+
+-- ── Attendance mẫu cho buổi đầu tiên ──────────────────────────────────
+INSERT INTO attendances (id, schedule_id, enrollment_id, is_present, remarks) VALUES
+(10, 10, 10, TRUE,  'Đúng giờ'),
+(11, 10, 11, FALSE, 'Vắng (demo)');
+
+-- ── Assignments + Submissions (để có "bài tập chờ chấm") ──────────────
+INSERT INTO assignments (id, class_id, teacher_id, title, description, attachment_url, due_date, max_score) VALUES
+(10, 9, 8, 'Homework 01 - Vocabulary', 'Làm bài tập từ vựng Unit 1 (demo).', NULL, '2026-04-02 23:59:00', 10.0),
+(11, 9, 8, 'Homework 02 - Writing Task', 'Viết đoạn văn 150 từ (demo).', NULL, '2026-04-05 23:59:00', 20.0);
+
+INSERT INTO submissions (id, assignment_id, student_id, teacher_id, submission_date, file_url, score, teacher_comment, status) VALUES
+(10, 10, 9, 8, '2026-03-30 20:30:00', 'https://example.com/submission/student_a_hw01.pdf', NULL, NULL, 'SUBMITTED'),
+(11, 10, 10, 8, '2026-03-30 20:40:00', 'https://example.com/submission/student_b_hw01.pdf', NULL, NULL, 'SUBMITTED'),
+(12, 11, 9, 8, '2026-04-01 20:30:00', 'https://example.com/submission/student_a_hw02.pdf', NULL, NULL, 'SUBMITTED');
+
 

@@ -3,11 +3,16 @@ package com.f4.forum.entity;
 import com.f4.forum.entity.enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,12 +33,12 @@ public class Invoice {
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @Builder.Default
     @Column(name = "base_amount", nullable = false, precision = 15, scale = 2)
-    @Builder.Default
     private BigDecimal baseAmount = BigDecimal.ZERO;
-
-    @Column(name = "final_amount", nullable = false, precision = 15, scale = 2)
+    
     @Builder.Default
+    @Column(name = "final_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal finalAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
@@ -43,42 +48,59 @@ public class Invoice {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceDetail> details = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
         name = "invoice_promotions",
         joinColumns = @JoinColumn(name = "invoice_id"),
         inverseJoinColumns = @JoinColumn(name = "promotion_id")
     )
-    @Builder.Default
     private Set<Promotion> promotions = new HashSet<>();
 
     @Version
     private Long version;
 
-    // Rich Domain Model
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // Rich Domain Model - Sử dụng Tell, Don't Ask pattern
     public void addDetail(InvoiceDetail detail) {
         details.add(detail);
         detail.assignToInvoice(this);
-        recalculateTotals();
+        // Tính toán finalPrice trước khi recalculateTotals
+        detail.calculateFinalPrice();
     }
 
     public void applyPromotion(Promotion promotion) {
         if (promotion.isValid()) {
             this.promotions.add(promotion);
-            recalculateTotals();
         } else {
             throw new IllegalArgumentException("Promotion is expired or invalid");
         }
+    }
+
+    // Gọi sau khi tất cả details và promotions đã được thêm vào
+    public void recalculateAll() {
+        recalculateTotals();
     }
     
     public void markAsPaid() {
         this.status = InvoiceStatus.PAID;
     }
 
+    public void setStatus(InvoiceStatus status) {
+        this.status = status;
+    }
+    
     private void recalculateTotals() {
         this.baseAmount = details.stream()
                 .map(InvoiceDetail::getFinalPrice)

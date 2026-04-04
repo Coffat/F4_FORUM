@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -34,11 +36,19 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
             @Param("status") ClassStatus status, 
             Pageable pageable);
 
-    /**
-     * Phục hồi các method cũ phục vụ Dashboard và PersonnelService
-     */
-    long countByStatusIn(List<ClassStatus> statuses);
+    @Query("SELECT c FROM ClassEntity c WHERE (:statuses IS NULL OR c.status IN :statuses)")
+    Page<ClassEntity> findAllByStatusIn(@Param("statuses") java.util.List<ClassStatus> statuses, Pageable pageable);
+    
+    @Query("SELECT COUNT(c) FROM ClassEntity c WHERE (:statuses IS NULL OR c.status IN :statuses)")
+    long countByStatusIn(@Param("statuses") java.util.List<ClassStatus> statuses);
 
-    @Query(value = "SELECT COUNT(DISTINCT ct.teacher_id) FROM classes c JOIN class_teachers ct ON c.id = ct.class_id WHERE c.status IN :#{#statuses.![name()]}", nativeQuery = true)
-    long countDistinctTeachersInActiveClasses(@Param("statuses") List<ClassStatus> statuses);
+    // N+1 Optimization to see how many distinct teachers are currently teaching
+    @Query("SELECT COUNT(DISTINCT t.id) FROM ClassEntity c JOIN c.teachers t WHERE c.status IN :statuses")
+    long countDistinctTeachersInActiveClasses(@Param("statuses") java.util.List<ClassStatus> statuses);
+
+    @Query("SELECT COUNT(DISTINCT c.id) FROM ClassEntity c JOIN c.teachers t WHERE t.id = :teacherId AND c.status IN :statuses")
+    long countActiveClassesByTeacher(
+            @Param("teacherId") Long teacherId,
+            @Param("statuses") java.util.List<ClassStatus> statuses
+    );
 }

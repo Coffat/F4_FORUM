@@ -103,6 +103,219 @@ Tài khoản không tồn tại!
 
 ---
 
+## 👨‍🏫 6. Teacher Portal Module
+
+Module phục vụ giao diện dành cho **ROLE_TEACHER** (Profile, lớp học, lịch dạy, ...).
+
+### Lấy hồ sơ giảng viên hiện tại (Me)
+
+- **URL**: `/api/v1/teachers/me`
+- **Method**: `GET`
+- **Auth required**: Yes (mock) — gửi `Authorization: Bearer <token>` lấy từ `/api/v1/auth/login`
+
+#### Headers
+| Header | Bắt buộc | Mô tả |
+| :--- | :---: | :--- |
+| `Authorization` | Có | `Bearer <token>` (token mock format: `...mock_token_for_<username>`) |
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+{
+  "username": "teacher",
+  "role": "ROLE_TEACHER",
+  "fullName": "Giảng viên Demo",
+  "email": "teacher@f4forum.com",
+  "phone": "0888777666",
+  "specialty": "IELTS Specialist",
+  "hireDate": "2024-01-01",
+  "lastLogin": "2026-03-30T12:38:48.007"
+}
+```
+
+#### Response - Thất bại (HTTP 400 Bad Request)
+Trả về chuỗi text lỗi:
+
+```text
+Thiếu Authorization Bearer token!
+```
+
+### Lấy metrics tổng quan (Overview)
+
+- **URL**: `/api/v1/teachers/me/overview`
+- **Method**: `GET`
+- **Auth required**: Yes (mock) — gửi `Authorization: Bearer <token>` lấy từ `/api/v1/auth/login`
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+{
+  "activeClassesCount": 1,
+  "pendingSubmissionsCount": 3,
+  "weeklySessionsCount": 3
+}
+```
+
+### Lấy danh sách bài tập theo lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/assignments`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Assignment 20260330-140530",
+    "description": "Làm bài tập từ vựng Unit 1",
+    "attachmentUrl": "uploaded://homework.pdf",
+    "dueDate": "2026-04-06T14:05:30"
+  }
+]
+```
+
+### Tạo bài tập mới cho lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/assignments`
+- **Method**: `POST`
+- **Auth required**: Yes (mock Bearer token)
+- **Content-Type**: `multipart/form-data`
+
+#### Form fields
+| Trường | Kiểu | Bắt buộc | Mô tả |
+| :--- | :---: | :---: | :--- |
+| `title` | String | Có | Tiêu đề bài tập |
+| `description` | String | Có | Mô tả bài tập cho học viên |
+| `dueDateTime` | String (ISO datetime) | Không | Hạn nộp, ví dụ `2026-04-06T23:59:00` |
+| `maxScore` | Number | Không | Điểm tối đa, để trống sẽ mặc định `100` |
+| `file` | File | Không | File đính kèm (nếu có) |
+
+#### Response - Thành công (HTTP 200 OK)
+Trả về object `TeacherAssignmentResponse` vừa tạo.
+
+### Lấy tất cả học viên của lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/students`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+[
+  {
+    "enrollmentId": 1,
+    "studentId": 21,
+    "fullName": "Học viên Demo A",
+    "email": "student.a@f4forum.com",
+    "phone": "0901000001",
+    "enrollmentStatus": "ENROLLED"
+  }
+]
+```
+
+### Attendance - Lấy danh sách buổi học của lớp
+
+- **URL**: `/api/v1/teachers/classes/{classId}/attendance/sessions`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Attendance - Lấy bảng điểm danh theo buổi
+
+- **URL**: `/api/v1/teachers/classes/{classId}/attendance?scheduleId={scheduleId}`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Attendance - Lưu điểm danh theo buổi
+
+- **URL**: `/api/v1/teachers/classes/{classId}/attendance?scheduleId={scheduleId}`
+- **Method**: `PUT`
+- **Auth required**: Yes (mock Bearer token)
+- **Body**:
+
+```json
+{
+  "entries": [
+    { "enrollmentId": 1, "isPresent": true, "remarks": "Đúng giờ" },
+    { "enrollmentId": 2, "isPresent": false, "remarks": "Vắng có phép" }
+  ]
+}
+```
+
+### Grades - Lấy bảng nhập điểm theo lớp
+
+- **URL**: `/api/v1/teachers/classes/{classId}/grades`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Grades - Lưu điểm theo lớp
+
+- **URL**: `/api/v1/teachers/classes/{classId}/grades`
+- **Method**: `PUT`
+- **Auth required**: Yes (mock Bearer token)
+- **Body**:
+
+```json
+{
+  "entries": [
+    {
+      "enrollmentId": 1,
+      "midtermScore": 80,
+      "finalScore": 85,
+      "grade": "B+",
+      "teacherComment": "Tiến bộ tốt"
+    }
+  ]
+}
+```
+
+### Materials - Lấy danh sách tài liệu của lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/materials`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+### Materials - Upload tài liệu cho lớp (Teacher)
+
+- **URL**: `/api/v1/teachers/classes/{classId}/materials`
+- **Method**: `POST`
+- **Auth required**: Yes (mock Bearer token)
+- **Content-Type**: `multipart/form-data`
+
+#### Form fields
+| Trường | Kiểu | Bắt buộc | Mô tả |
+| :--- | :---: | :---: | :--- |
+| `title` | String | Có | Tiêu đề tài liệu |
+| `description` | String | Không | Mô tả (optional) |
+| `file` | File | Có | File tài liệu |
+
+### Schedule - Lấy lịch dạy theo khoảng ngày (Teacher)
+
+- **URL**: `/api/v1/teachers/me/schedule?from={yyyy-MM-dd}&to={yyyy-MM-dd}`
+- **Method**: `GET`
+- **Auth required**: Yes (mock Bearer token)
+
+#### Response - Thành công (HTTP 200 OK)
+
+```json
+[
+  {
+    "scheduleId": 1,
+    "classId": 9,
+    "classCode": "TEA-2026-01",
+    "courseName": "IELTS Foundation – Khởi Đầu",
+    "date": "2026-03-30",
+    "startTime": "18:00:00",
+    "endTime": "20:00:00",
+    "roomName": "Phòng 101 – Lớp Nhỏ",
+    "online": false,
+    "meetingLink": null
+  }
+]
+```
+
 ## 🛠️ 3. Admin - User Management Module
 
 Module dành riêng cho Quản trị viên điều hành nhân sự, học viên và hệ thống.

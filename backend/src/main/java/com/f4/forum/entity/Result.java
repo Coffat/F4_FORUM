@@ -1,5 +1,6 @@
 package com.f4.forum.entity;
 
+import com.f4.forum.exception.ValidationException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,9 +38,18 @@ public class Result {
     private Long version;
 
     public void updateScores(BigDecimal midterm, BigDecimal finalScore, String grade, String comment) {
+        validateScore(midterm);
+        validateScore(finalScore);
         this.midtermScore = midterm;
         this.finalScore = finalScore;
         this.grade = grade;
         this.teacherComment = comment;
+    }
+
+    private void validateScore(BigDecimal score) {
+        if (score == null) return;
+        if (score.compareTo(BigDecimal.ZERO) < 0 || score.compareTo(BigDecimal.valueOf(100)) > 0) {
+            throw new ValidationException("Điểm phải nằm trong khoảng 0-100!");
+        }
     }
 }
